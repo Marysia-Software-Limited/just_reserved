@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "just-reserved"
+version = "0.1.0"
+description = ""
+authors = ["Adam Beret Manczuk <beret@hipisi.org.pl>"]
+readme = "README.md"
+packages = [{include = "just_reserved"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+django = "<4.1"
+django-scheduler = "^0.10.1"
+django-bower = "^5.2.0"
+django-extensions = "^3.2.1"
+werkzeug = "^2.2.2"
+holidays = "^0.19"
+nptime = "^1.1"
+
+[tool.poetry.dev-dependencies]
+# for local development only
+flet-core = {path = "../flet/sdk/python/packages/flet-core", develop = true}
+flet = {path = "../flet/sdk/python/packages/flet", develop = true}
+flet-django = {path = "../flet-django", develop = true}
+#flet-core = { subdirectory = "sdk/python/packages/flet-core", git = "https://github.com/Marysia-Software-Limited/flet.git", branch = "flet-django", develop = true}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
