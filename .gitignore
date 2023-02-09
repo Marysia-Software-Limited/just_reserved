@@ -1,0 +1,7 @@
+# Project specyfic ignores
+
+*.sqlite3
+.venv
+.idea
+.env
+*.lock
