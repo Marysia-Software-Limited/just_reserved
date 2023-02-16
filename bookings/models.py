@@ -37,14 +37,14 @@ class Booking(models.Model):
             self.date_end
         ]
         __hash_str = ":".join(map(str, __hash_data))
-        return md5(__hash_str)
+        return md5(__hash_str.encode('utf-8')).hexdigest()
 
     @classmethod
-    def get_slot(cls, calendar_date, time: nptime, duration, pod):
+    def get_slot(cls, calendar_date, time: nptime, duration, pod, email):
         calendar_date = datetime(day=calendar_date.day, month=calendar_date.month, year=calendar_date.year)
         date_start = calendar_date + time.to_timedelta()
         date_end = date_start + duration
-        return cls(pod=pod, date_start=date_start, date_end=date_end)
+        return cls(pod=pod, date_start=date_start, date_end=date_end, email=email)
 
     @classmethod
     def get_qs(cls, qs=None):

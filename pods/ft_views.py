@@ -8,6 +8,8 @@ from nptime import nptime
 from .models import Pod, Service
 from bookings.models import Booking
 
+TESTING_EMAIL = "beret@hipisi.org.pl"
+
 
 def services(page):
     pod = Pod.objects.first()
@@ -76,7 +78,9 @@ def calendar(page, pod_id, service_id, start_date=datetime.now()):
                     calendar_date=calendar_date,
                     time=slot_time,
                     duration=service.slot,
-                    pod=pod)
+                    pod=pod,
+                    email=TESTING_EMAIL
+                )
 
                 def __on_slot_selected(_event: event.Event):
 
