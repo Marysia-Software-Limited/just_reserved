@@ -5,4 +5,4 @@
 .idea
 .env
 *.lock
-/bower_components/
+/bower_components

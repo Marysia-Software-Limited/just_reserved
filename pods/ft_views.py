@@ -79,7 +79,44 @@ def calendar(page, pod_id, service_id, start_date=datetime.now()):
                     pod=pod)
 
                 def __on_slot_selected(_event: event.Event):
-                    print(booking)
+
+                    def __set_booking():
+                        if booking.count > 0:
+                            booking.save()
+                            page.session["booking"] = booking
+                        check_button(checking_button)
+                        page.update()
+
+                    last_booking = page.session.get("booking", None)
+
+                    if last_booking is not None:
+                        def close_no(e):
+                            dlg_modal.open = False
+                            page.update()
+
+                        def close_yes(e):
+                            dlg_modal.open = False
+                            last_booking.delete()
+                            __set_booking()
+
+                        dlg_modal = ft.AlertDialog(
+                            modal=True,
+                            title=ft.Text("Zdecyduj się człowieku!"),
+                            content=ft.Text(f"Co za dużo to niezdrowo. Masz już zarezerwowaną egzekucję na {last_booking.date_start.day}.{last_booking.date_start.month}.{last_booking.date_start.year}. Czy chcesz zmienić ten termin?"),
+                            actions=[
+                                ft.TextButton("Tak!", on_click=close_no),
+                                ft.TextButton("Nie!", on_click=close_yes),
+                            ],
+                            actions_alignment=ft.MainAxisAlignment.END,
+                            on_dismiss=lambda e: print("Modal dialog dismissed!"),
+                        )
+
+                        page.ft_page.dialog = dlg_modal
+                        dlg_modal.open = True
+                        page.update()
+                    else:
+                        __set_booking()
+
                     if booking.count > 0:
                         booking.save()
                     check_button(checking_button)

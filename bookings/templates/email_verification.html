@@ -1,0 +1,8 @@
+<div>
+    <div><a href=
+    "http://{{ domain }}{% url 'activate' token=booking.token %}">
+    Potwierdź swoją rezerwację {{ booking.pod }} na {{ booking.term_str }}.</a></div>
+    <div><a href=
+    "http://{{ domain }}{% url 'delete' token=booking.token %}">
+    Usuń swoją rezerwację {{ booking.pod }} na {{ booking.term_str }} jeżeli zmieniłeś zdanie.</a></div>
+</div>

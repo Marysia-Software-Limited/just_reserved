@@ -16,6 +16,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from bookings.views import BookingActivateView, BookingDeleteView
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('activate/<token>',
+             BookingActivateView.as_view(),
+             name='activate'),
+    path('delete/<token>',
+             BookingDeleteView.as_view(),
+             name='delete'),
 ]
