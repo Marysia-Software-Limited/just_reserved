@@ -6,7 +6,7 @@ import flet as ft
 from nptime import nptime
 
 from .models import Pod, Service
-from bookings.models import Booking
+from bookings.controls import BookingFormView
 
 TESTING_EMAIL = "beret@hipisi.org.pl"
 
@@ -73,73 +73,19 @@ def calendar(page, pod_id, service_id, start_date=datetime.now()):
         def slot(slot_time: nptime):
             label = f"{slot_time.hour:02d}:{slot_time.minute:02d}"
 
-            def check_button(checking_button):
-                booking = Booking.get_slot(
-                    calendar_date=calendar_date,
-                    time=slot_time,
-                    duration=service.slot,
-                    pod=pod,
-                    email=TESTING_EMAIL
-                )
-
-                def __on_slot_selected(_event: event.Event):
-
-                    def __set_booking():
-                        if booking.count > 0:
-                            booking.save()
-                            page.session["booking"] = booking
-                        check_button(checking_button)
-                        page.update()
-
-                    last_booking = page.session.get("booking", None)
-
-                    if last_booking is not None:
-                        def close_no(e):
-                            dlg_modal.open = False
-                            page.update()
-
-                        def close_yes(e):
-                            dlg_modal.open = False
-                            last_booking.delete()
-                            __set_booking()
-
-                        dlg_modal = ft.AlertDialog(
-                            modal=True,
-                            title=ft.Text("Zdecyduj się człowieku!"),
-                            content=ft.Text(f"Co za dużo to niezdrowo. Masz już zarezerwowaną egzekucję na {last_booking.date_start.day}.{last_booking.date_start.month}.{last_booking.date_start.year}. Czy chcesz zmienić ten termin?"),
-                            actions=[
-                                ft.TextButton("Tak!", on_click=close_no),
-                                ft.TextButton("Nie!", on_click=close_yes),
-                            ],
-                            actions_alignment=ft.MainAxisAlignment.END,
-                            on_dismiss=lambda e: print("Modal dialog dismissed!"),
-                        )
-
-                        page.ft_page.dialog = dlg_modal
-                        dlg_modal.open = True
-                        page.update()
-                    else:
-                        __set_booking()
-
-                    if booking.count > 0:
-                        booking.save()
-                    check_button(checking_button)
-                    page.update()
-
-                if booking.count > 0:
-                    checking_button.on_click = __on_slot_selected
-                    checking_button.tooltip = service
-                else:
-                    checking_button.tooltip = "Zarezerwowane, zapraszamy w innym terminie."
-                    checking_button.disabled = True
-                    checking_button.on_click = None
+            booking_form = BookingFormView(
+                calendar_date=calendar_date,
+                time=slot_time,
+                duration=service.slot,
+                pod=pod
+            )
 
             button = ft.ElevatedButton(
                 label,
                 icon=ft.icons.ACCESS_TIME,
-                tooltip=service
+                tooltip=service,
+                on_click=lambda _: booking_form(page)
             )
-            check_button(button)
             return button
 
         return map(slot, service.slots(pod))
