@@ -50,26 +50,21 @@ class BookingFormView(object):
         if self.__form_dialog is not None:
             return self.__form_dialog
 
-        content: ft.Control = ft.Column(
-            controls=[
-                self.email_input,
-                self.error_message
-            ],
-        )
+        content: ft.Control = self.email_input
 
         return ft.AlertDialog(
             modal=True,
             title=ft.Text("Podaj swój email do rezerwacji"),
             content=content,
             actions=[
-                ft.TextButton("Rezygnuj", on_click=lambda _: self.close()),
-                ft.TextButton("Rezerwuj", on_click=self.on_submit),
+                ft.TextButton("Rezygnuj", on_click=lambda _:self.close()),
+                ft.TextButton("Rezerwuj", on_click=lambda _:self.submit()),
             ],
             actions_alignment=ft.MainAxisAlignment.END,
             on_dismiss=lambda e: print("Modal dialog dismissed!"),
         )
 
-    def on_submit(self, event: ft.Event):
+    def submit(self):
         data = {
             "email": self.email_input.value
         }
@@ -160,12 +155,12 @@ class BookingFormView(object):
         self.__page.update()
 
     def on_replace(self, booking: Booking):
-        def __on_replace(event: ft.Event):
+        def __on_replace(*_):
             """TODO: use transaction here"""
             self.bookings.filter(email=booking.email).delete()
             self.save(booking)
 
         return __on_replace
 
-    def on_reset(self, event: ft.Event):
+    def on_reset(self, *_):
         self.close()
