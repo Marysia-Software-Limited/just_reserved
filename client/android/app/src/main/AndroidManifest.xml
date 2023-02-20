@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.client">
+    package="app.marysia.just_reserved">
    <application
-        android:label="client"
+        android:label="just_reserved"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

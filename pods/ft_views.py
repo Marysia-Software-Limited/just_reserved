@@ -1,10 +1,14 @@
 from datetime import time, timedelta, date, datetime
+from typing import Callable
 
 from flet_core import event
 from flet_django import ft_view
 import flet as ft
 from nptime import nptime
 
+from django.utils.translation import gettext as _
+
+from bookings.models import Booking
 from .models import Pod, Service
 from bookings.controls import BookingFormView
 
@@ -21,25 +25,25 @@ def calendar(page, pod_id, service_id, start_date=datetime.now()):
     pod = Pod.objects.get(pk=pod_id)
     service = Service.objects.get(pk=service_id)
 
-    def on_click_week(_):
-        calendar_control.calendar_format = ft.CalendarFormat.WEEK
-        page.update()
-
-    week_button = ft.ElevatedButton(
-        "Week",
-        icon=ft.icons.CALENDAR_VIEW_WEEK,
-        on_click=on_click_week,
-    )
-
-    def on_click_month(_):
-        calendar_control.calendar_format = ft.CalendarFormat.MONTH
-        page.update()
-
-    month_button = ft.ElevatedButton(
-        "Month",
-        icon=ft.icons.CALENDAR_MONTH,
-        on_click=on_click_month,
-    )
+    # def on_click_week(_):
+    #     calendar_control.calendar_format = ft.CalendarFormat.WEEK
+    #     page.update()
+    #
+    # week_button = ft.ElevatedButton(
+    #     _("Week"),
+    #     icon=ft.icons.CALENDAR_VIEW_WEEK,
+    #     on_click=on_click_week,
+    # )
+    #
+    # def on_click_month(_):
+    #     calendar_control.calendar_format = ft.CalendarFormat.MONTH
+    #     page.update()
+    #
+    # month_button = ft.ElevatedButton(
+    #     _("Month"),
+    #     icon=ft.icons.CALENDAR_MONTH,
+    #     on_click=on_click_month,
+    # )
 
     def on_day_selected(__calendar):
         def __on_day_selected(_event: event.Event):
@@ -57,7 +61,7 @@ def calendar(page, pod_id, service_id, start_date=datetime.now()):
     )
     calendar_control.on_day_selected = on_day_selected(calendar_control)
     calendar_title_row = ft.Row(
-        controls=[week_button, month_button, ft.Text(pod)]
+        controls=[ft.Text(pod)]
     )
 
     calendar_column = ft.Column(
@@ -80,11 +84,29 @@ def calendar(page, pod_id, service_id, start_date=datetime.now()):
                 pod=pod
             )
 
+            booking = Booking(
+                pod=pod,
+                date_start=booking_form.date_start,
+                date_end=booking_form.date_end
+            )
+
+            on_click: Callable = lambda *_: None
+            disable = True
+
+            if booking.count > 0:
+                def __open_form(*_):
+                    page.append_view(booking_form)
+                    page.update()
+
+                on_click = __open_form
+                disable = False
+
             button = ft.ElevatedButton(
                 label,
                 icon=ft.icons.ACCESS_TIME,
                 tooltip=service,
-                on_click=lambda _: booking_form(page)
+                on_click=on_click,
+                disabled=disable
             )
             return button
 

@@ -30,12 +30,11 @@ def home(page):
 
 
 main = fdj.GenericApp(
-    destinations=[
-        fdj.Fatum("/", icon=ft.icons.HOME, label="home"),
-        fdj.Fatum("/services", icon=ft.icons.LIST_SHARP, label="menu")
-    ],
+    # destinations=[
+    #     fdj.Fatum("/", icon=ft.icons.HOME, label="home"),
+    #     fdj.Fatum("/services", icon=ft.icons.LIST_SHARP, label="menu")
+    # ],
     urls=[
-        path("", home),
-        path("services", services)
+        path("", services),
     ]
 )

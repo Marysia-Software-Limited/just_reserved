@@ -5,10 +5,11 @@ import flet as ft
 from flet_django import *
 from nptime import nptime
 
-from pods.models import Pod
-from .models import Booking, EXPIRE_MINUTES
+from django.utils.translation import gettext as _
 
+from pods.models import Pod
 from .forms import BookingEmailForm
+from .models import Booking, EXPIRE_MINUTES
 
 
 class BookingFormView(object):
@@ -24,44 +25,42 @@ class BookingFormView(object):
 
         self.email_input: ft.TextField = ft.TextField(
             keyboard_type=ft.KeyboardType.EMAIL,
-            label="Email",
-            helper_text="Podaj adres email aby zapisać swoją rezerwację."
+            label=_("Email"),
+            helper_text=_("Enter the email address to save your reservation.")
         )
-        self.error_message: ft.Control = ft.TextField()
+        self.email_errors = ft.Markdown()
+        self.message: ft.Control = ft.Text()
         self.__form_dialog: Optional[ft.AlertDialog] = None
         self.__page: Optional[ft.Page] = None
-
-    @property
-    def dialog(self) -> Optional[ft.AlertDialog]:
-        return self.__page.dialog if self.__page else None
-
-    @dialog.setter
-    def dialog(self, new_dialog: ft.AlertDialog):
-        self.__page.dialog = new_dialog
-        new_dialog.open = True
-        self.update()
+        self.title: ft.Control = ft.Text(_("Enter your email for booking"))
+        self.buttons: ft.Row = ft.Row()
 
     @property
     def bookings(self):
         return Booking.bookings(self.pod, self.date_start, self.date_end)
 
-    @property
-    def form_dialog(self) -> ft.AlertDialog:
-        if self.__form_dialog is not None:
-            return self.__form_dialog
+    def get_form_view(self, page) -> ft.View:
 
-        content: ft.Control = self.email_input
+        self.buttons.controls = [
+            ft.TextButton(_("Reject"), on_click=lambda _: self.close()),
+            ft.TextButton(_("Reserve"), on_click=lambda _: self.submit()),
+        ]
+        column = ft.Column(
+            controls=[
+                self.title,
+                self.email_input,
+                self.email_errors,
+                self.message,
+                self.buttons
+            ]
+        )
+        controls = [ft.Container(
+            content=column
+        )]
 
-        return ft.AlertDialog(
-            modal=True,
-            title=ft.Text("Podaj swój email do rezerwacji"),
-            content=content,
-            actions=[
-                ft.TextButton("Rezygnuj", on_click=lambda _:self.close()),
-                ft.TextButton("Rezerwuj", on_click=lambda _:self.submit()),
-            ],
-            actions_alignment=ft.MainAxisAlignment.END,
-            on_dismiss=lambda e: print("Modal dialog dismissed!"),
+        return ft_view(
+            page,
+            controls=controls,
         )
 
     def submit(self):
@@ -70,6 +69,7 @@ class BookingFormView(object):
         }
         form = BookingEmailForm(data)
         if form.is_valid():
+            self.email_errors.value = ""
             booking = Booking(
                 pod=self.pod,
                 date_start=self.date_start,
@@ -81,78 +81,83 @@ class BookingFormView(object):
             if bookings.count():
                 on_replace = self.on_replace(booking)
                 return self.alert_dialog(on_replace, bookings)
+            else:
+                self.save(booking)
+        else:
+            email_html_error = form.errors.get("email")
+
+            if email_html_error:
+                self.email_errors.value = email_html_error.as_text()
+                self.update()
 
     def alert_dialog(self, on_replace, bookings):
 
-        messages = ["Co za dużo to niezdrowo."]
-        word: str = "już"
+        messages = [_("What too much is not healthy.")]
+        word: str = _("You already have")
         for booking in bookings:
             messages.append(
-                f"Masz {word} zarezerwowaną egzekucję na {booking.term_str}.")
-            word = "też"
-        messages.append(
-            f"Czy chcesz odwołać {'te terminy' if len(bookings) > 1 else 'ten termin'} i zarezerwować nowy?")
+                _("{word} the execution reserved for {term}.").format(word=word, term=booking.term_str))
+            word = _("You have also")
 
-        self.dialog = ft.AlertDialog(
-            modal=True,
-            title=ft.Text("Zdecyduj się człowieku!"),
-            content=ft.Text(" ".join(messages)),
-            actions=[
-                ft.TextButton("Rezygnuj", on_click=self.on_reset),
-                ft.TextButton("Zamień", on_click=on_replace),
-            ],
-            actions_alignment=ft.MainAxisAlignment.END,
-            on_dismiss=lambda e: print("Modal dialog dismissed!"),
-        )
+        messages.append(
+            _("Do you want to cancel this date and book a new one?"))
+
+        self.title.value = _("Decide man!")
+        self.message.value = " ".join(messages)
+        self.buttons.controls = [
+            ft.TextButton(_("Reject"), on_click=self.on_reset),
+            ft.TextButton(_("Replace"), on_click=on_replace),
+        ]
+
+        self.update()
 
     def save(self, booking):
         if booking.count < 1:
             return self.message_dialog(
-                message="Termin już zarezerwowany, spróbuj inny",
-                title="Termin niedostępny"
+                message=_("The term already reserved, try another!"),
+                title=_("Term is unavailable")
             )
         booking.save()
-        message = f"""Zarezerwowałeś {booking.pod} w termine {booking.term_str}.
-        Potwierdź proszę w przeciągu {EXPIRE_MINUTES} minut, klikając na link który znajdziesz w emailu wysłanym na 
-        adres {booking.email}.
-        """
+        # self.close()
+        message = _("""You reserved {pod} on the term {term}.
+        Confirm please within {expire} minutes by clicking on the link that you will find in an email sent to 
+         address {email}.
+        """).format(pod=self.pod, expire=EXPIRE_MINUTES, term=booking.term_str, email=booking.email)
         self.message_dialog(
             message=message,
-            title="Zapisaliśmy rezerwację. Czekamy na potwierdzenie."
+            title=_("We saved the reservation. We are waiting for confirmation.")
         )
 
     def message_dialog(
             self,
             message: str,
             title: str = "",
-            button_text: str = "Dobra",
+            button_text: str = _("OK"),
             on_click=None
     ):
 
         on_click = on_click or self.on_reset
 
-        self.dialog = ft.AlertDialog(
-            modal=True,
-            title=ft.Text(title),
-            content=ft.Text(message),
-            actions=[
-                ft.TextButton(button_text, on_click=on_click),
-            ],
-            actions_alignment=ft.MainAxisAlignment.END,
-            on_dismiss=lambda e: print("Modal dialog dismissed!"),
-        )
+        self.title.value = title
+        self.message.value = message
+        self.buttons.controls = [
+            ft.TextButton(button_text, on_click=on_click),
+        ]
+        self.update()
 
     def __call__(self, page: GenericPage):
-        self.__page = page.ft_page
-        self.dialog = self.form_dialog
+        self.page = page
+        return self.get_form_view(page)
 
     def close(self):
-        self.dialog.open = False
-        self.update()
-        self.__page = None
+        if self.page:
+            if self.page.dialog:
+                self.page.dialog.open = False
+            self.page.ft_page.views.pop()
+            self.update()
 
-    def update(self):
-        self.__page.update()
+    def update(self, *controls):
+        self.page.update(*controls)
 
     def on_replace(self, booking: Booking):
         def __on_replace(*_):

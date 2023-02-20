@@ -9,6 +9,7 @@ from django.template.loader import render_to_string
 from nptime import nptime
 
 from pods.models import Pod
+from utils import time_str, date_str
 
 EXPIRE_MINUTES = 30
 DOMAIN = "http://ala.marysia.app"
@@ -71,15 +72,15 @@ class Booking(models.Model):
 
     @property
     def date_str(self):
-        return f"{self.date_start.day}.{self.date_start.month}.{self.date_start.year}"
+        return date_str(self.date_start)
 
     @property
     def time_start_str(self):
-        return f"{self.date_start.hour:02d}:{self.date_start.minute:02d}"
+        return time_str(self.date_start)
 
     @property
     def time_end_str(self):
-        return f"{self.date_end.hour:02d}:{self.date_end.minute:02d}"
+        return time_str(self.date_end)
 
     @property
     def term_str(self):
