@@ -60,6 +60,7 @@ android {
             signingConfig signingConfigs.debug
         }
     }
+    namespace 'app.marysia.just_reserved'
 }
 
 flutter {

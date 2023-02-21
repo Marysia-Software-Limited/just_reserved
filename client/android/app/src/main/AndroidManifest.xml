@@ -1,5 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="app.marysia.just_reserved">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
    <application
         android:label="just_reserved"
         android:name="${applicationName}"

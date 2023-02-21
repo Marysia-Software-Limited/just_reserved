@@ -9,7 +9,6 @@ const bool isProduction = bool.fromEnvironment('dart.vm.product');
 
 void main([List<String>? args]) async {
   if (isProduction) {
-    // ignore: avoid_returning_null_for_void
     debugPrint = (String? message, {int? wrapWidth}) => null;
   }
 
@@ -17,12 +16,9 @@ void main([List<String>? args]) async {
 
   var pageUrl = Uri.base.toString();
   var assetsDir = "";
-  //debugPrint("Uri.base: ${Uri.base}");
 
   if (kDebugMode) {
-//     if (kIsWeb) {
-    pageUrl = "http://192.168.50.101:8550";
-//
+    pageUrl = "http://ala.hipisi.org.pl:8550";
   }
 
   if (kIsWeb) {
