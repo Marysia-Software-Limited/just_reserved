@@ -18,7 +18,7 @@ void main([List<String>? args]) async {
   var assetsDir = "";
 
   if (kDebugMode) {
-    pageUrl = "http://ala.hipisi.org.pl:8550";
+    pageUrl = "http://192.168.50.102:8550";
   }
 
   if (kIsWeb) {
