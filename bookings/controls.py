@@ -153,8 +153,8 @@ class BookingFormView(object):
         if self.page:
             if self.page.dialog:
                 self.page.dialog.open = False
-            self.page.ft_page.views.pop()
-            self.update()
+            self.page.pop()
+            # self.update()
 
     def update(self, *controls):
         self.page.update(*controls)

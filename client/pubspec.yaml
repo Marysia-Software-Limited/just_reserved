@@ -33,7 +33,7 @@ dependencies:
     sdk: flutter
 
   flet:
-    path: ../../flet/package/
+#    path: ../../flet/package/
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.5
@@ -99,5 +99,5 @@ flutter:
 flutter_icons:
   android: true
   ios: true
-  image_path: "assets/icon/flet-ios-1024.png"
-  image_path_android: "assets/icon/flet-android-192.png"
+  image_path: "assets/icon/logo_512.jpg"
+  image_path_android: "assets/icon/logo_small.png"
