@@ -20,6 +20,7 @@ beautifulsoup4 = "^4.11.2"
 injector = "^0.20.1"
 flet = "^0.4.2"
 flet-django = { git = "https://github.com/Marysia-Software-Limited/flet-django.git", develop = true}
+beret-utils = "^0.4.8"
 
 
 [tool.poetry.dev-dependencies]

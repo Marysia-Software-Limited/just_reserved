@@ -27,6 +27,7 @@ class Booking(models.Model):
         if self.pk is None:
             self.token = self.token or self.get_token()
             self.expired = self.expired or self.date_start + timedelta(minutes=EXPIRE_MINUTES)
+            self._send_email_verification()
         super().save(*args, **kwargs)
 
     def get_token(self):
@@ -99,4 +100,6 @@ class Booking(models.Model):
                 'booking': self,
             }
         )
-        EmailMessage(to=[self.email], subject=subject, body=body).send()
+        email = EmailMessage(to=[self.email], subject=subject, body=body)
+        email.content_subtype = "html"
+        email.send()

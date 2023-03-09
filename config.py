@@ -1,0 +1,33 @@
+import os
+
+from beret_utils import get_config
+from beret_utils.config import bool_value, EnvValue
+from beret_utils import PathData
+
+base_dir = PathData.main()
+
+DEFAULT_CONFIG = (
+    ('PROJECT_NAME', 'just_reserved'),
+    ('PROJECT_ENV', 'local'),
+    ('POSTGRES_ENGINE', 'django.db.backends.postgresql'),
+    ('POSTGRES_DB', 'postgres'),
+    ('POSTGRES_USER', 'postgres'),
+    ('POSTGRES_PASSWORD', 'postgres'),
+    ('POSTGRES_HOST', 'db'),
+    ('POSTGRES_PORT', ''),
+    ('SECRET_KEY', "django-insecure-aj#exo2bw$h%ps^hr4o+ch)e_u2ao1j19rd6z0q)l1o#e!9rn5"),
+    ('DJANGO_EMAIL_HOST_USER', 'just_reserved@marysia.app'),
+    ('DJANGO_EMAIL_HOST_PASSWORD', 'key'),
+ )
+
+ENV_FILES = (
+    '.local.env',
+    '.env',
+)
+
+Config = get_config(DEFAULT_CONFIG, ENV_FILES)
+config = Config()
+
+if __name__ == '__main__':
+    for key, value in config.items():
+        print(f"{key}={value}")

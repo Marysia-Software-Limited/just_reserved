@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 import os
 from pathlib import Path
+from config import config
 
 from djangobower.conf import BOWER_PATH
 
@@ -148,3 +149,12 @@ BOWER_INSTALLED_APPS = (
     'jquery-ui',
     'bootstrap'
 )
+
+# Email configuartion
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = config.DJANGO_EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD = config.DJANGO_EMAIL_HOST_PASSWORD
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'just_reserved@marysia.app'
