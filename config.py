@@ -19,6 +19,7 @@ DEFAULT_CONFIG = (
     ('SECRET_KEY', "django-insecure-aj#exo2bw$h%ps^hr4o+ch)e_u2ao1j19rd6z0q)l1o#e!9rn5"),
     ('DJANGO_EMAIL_HOST_USER', 'just_reserved@marysia.app'),
     ('DJANGO_EMAIL_HOST_PASSWORD', 'key'),
+    ('DEEP_AI_API_KEY', 'api-key')
  )
 
 ENV_FILES = (

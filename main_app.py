@@ -12,18 +12,20 @@ from flet_django.navigation import Fatum
 from ft_views import home, ViewFactory
 
 
-
+app_bar_params = dict(bgcolor=ft.colors.SURFACE_VARIANT)
+view_params = dict(app_bar_params=app_bar_params)
 
 
 main = fdj.GenericApp(
     destinations=[
-        fdj.Fatum("/", icon=ft.icons.HOME, label="home", action=True, nav_bar=True),
-        fdj.Fatum("/services", icon=ft.icons.LIST_SHARP, label="reservation", action=True, nav_bar=True)
+        fdj.Fatum("/", icon=ft.icons.HOME, label="home", action=False, nav_bar=True),
+        fdj.Fatum("/services", icon=ft.icons.LIST_SHARP, label="reservation", action=False, nav_bar=True)
     ],
     urls=[
         path("", home),
         path("services", services),
         path("services/<int:pod_id>/", services)
     ],
-    view_factory=ViewFactory
+    view_factory=ViewFactory,
+    view_params=view_params,
 )
