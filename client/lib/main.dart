@@ -18,7 +18,8 @@ void main([List<String>? args]) async {
   var assetsDir = "";
 
   if (kDebugMode) {
-    pageUrl = "http://94.23.247.130:8550";
+    // pageUrl = "http://94.23.247.130:8550";  // ala.marysia.app application
+    pageUrl = "http://192.168.50.101:8550"; // my local computer
   }
 
   if (kIsWeb) {

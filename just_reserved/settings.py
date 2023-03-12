@@ -13,7 +13,7 @@ import os
 from pathlib import Path
 from config import config
 
-from djangobower.conf import BOWER_PATH
+# from djangobower.conf import BOWER_PATH
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 PROJECT_ROOT = BASE_DIR = Path(__file__).resolve().parent.parent
@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'flet_django',
     'django_extensions',
     'schedule',
-    'djangobower',
+    # 'djangobower',
     'bookings',
     'pods',
 ]
@@ -139,16 +139,16 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'djangobower.finders.BowerFinder',
+    # 'djangobower.finders.BowerFinder',
 ]
 
-BOWER_COMPONENTS_ROOT = '/PROJECT_ROOT/components/'
-
-BOWER_INSTALLED_APPS = (
-    'jquery',
-    'jquery-ui',
-    'bootstrap'
-)
+# BOWER_COMPONENTS_ROOT = '/PROJECT_ROOT/components/'
+#
+# BOWER_INSTALLED_APPS = (
+#     'jquery',
+#     'jquery-ui',
+#     'bootstrap'
+# )
 
 # Email configuartion
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

@@ -123,7 +123,6 @@ def calendar(page, pod_id, service_id, start_date=datetime.now()):
         horizontal_alignment=ft.CrossAxisAlignment.CENTER
     )
 
-    return ft_view(
-        page=page,
+    return page.get_view(
         controls=[column],
     )

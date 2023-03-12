@@ -1,4 +1,5 @@
 <div>
+    <img src="logo.png" />
     <div><a href={{ domain }}{% url 'activate' token=booking.token %}">
     Potwierdź swoją rezerwację {{ booking.pod }} na {{ booking.term_str }}.</a></div>
     <div><a href={{ domain }}{% url 'delete' token=booking.token %}">

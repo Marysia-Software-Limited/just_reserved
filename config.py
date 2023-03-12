@@ -5,6 +5,7 @@ from beret_utils.config import bool_value, EnvValue
 from beret_utils import PathData
 
 base_dir = PathData.main()
+assets_dir = base_dir("assets")
 
 DEFAULT_CONFIG = (
     ('PROJECT_NAME', 'just_reserved'),

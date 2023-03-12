@@ -1,13 +1,16 @@
 # This is a sample Python script.
 from dataclasses import dataclass
+from typing import Optional
 
 # Press ⌃R to execute it or replace it with your code.
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 
 import flet as ft
-from flet_django import ft_view
 from flet_django import GenericApp
 from flet_django import GenericPage
+from flet_django import GenericViewFactory
+
+from config import assets_dir
 
 
 def get_pods():
@@ -16,13 +19,6 @@ def get_pods():
 
 
 def home(page: GenericPage, pods_qs=get_pods):
-    # page.ft_page.floating_action_button = ft.FloatingActionButton(
-    #     icon=ft.icons.ADD,
-    #     on_click=lambda _: None,
-    # )
-    # page.ft_page.scroll = ft.ScrollMode.ALWAYS
-    # page.update()
-
     text = ft.Container(
         content=ft.Text(
             "This is not a regular app, like many others. This application is the first ever created and published in the newest, revolutionary Green Cloud Technology. Our outstanding Marysia Software team found a way to connect two well-established environments - Phyton -Django- and Dart -Flutter. It's just the first step, but the journey looks very promising. Try our Reservation App Demo and find out more on www.marysia.app.",
@@ -42,16 +38,6 @@ def home(page: GenericPage, pods_qs=get_pods):
         opacity=1,
         border_radius=20,
     )
-
-    # column = ft.Column(
-    #     alignment=ft.MainAxisAlignment.SPACE_EVENLY,
-    #     horizontal_alignment=ft.CrossAxisAlignment.CENTER
-    # )
-
-    # container = ft.Container(
-    #     content=column,
-    #     alignment=ft.alignment.center
-    # )
 
     controls = []
 
@@ -88,30 +74,84 @@ def home(page: GenericPage, pods_qs=get_pods):
         alignment=ft.MainAxisAlignment.END,
         horizontal_alignment=ft.CrossAxisAlignment.CENTER
     )
-    return ft_view(
-        page=page,
+    return page.get_view(
         controls=[column],
     )
 
 
-def get_view(controls, **kwargs):
-    if len(controls) > 1:
-        content = ft.Column(
-            controls=controls,
-            alignment=ft.MainAxisAlignment.CENTER,
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER
+class ViewFactory(GenericViewFactory):
+    background: Optional[ft.Container] = None
+
+    def set_background(self, file_name):
+        self.page.session["background"] = f"/backgrounds/{file_name}"
+        self.background.image_src = self.page.session["background"]
+        self.background.update()
+
+    def get_on_select(self, file_name):
+        def __wrap_click(_):
+            self.set_background(file_name)
+
+        return __wrap_click
+
+    @property
+    def select_background(self):
+        __select_background = ft.PopupMenuButton(
+            items=[]
         )
-    else:
-        content = controls[0]
-    controls = [
-        ft.Container(
-            image_src="/background22.png",
+
+        for img_file in assets_dir("backgrounds"):
+            print(f"show: {img_file.name}")
+            item = ft.PopupMenuItem(
+                content=ft.Image(
+                    src=f"/backgrounds/{img_file.name}",
+                    width=300,
+                    height=200
+                ),
+                on_click=self.get_on_select(img_file.name)
+            )
+            __select_background.items.append(item)
+
+        return __select_background
+
+    def app_bar_factory(self, **app_bar_params):
+        app_bar = super().app_bar_factory(**app_bar_params)
+        app_bar.actions.append(self.select_background)
+        return app_bar
+
+    def get_view(self, controls, **kwargs):
+
+        if "background" not in self.page.session:
+            self.page.session["background"] = "/backgrounds/background22.png"
+
+        for img_file in assets_dir("backgrounds"):
+            print(f"img: {img_file.name}")
+
+        self.page.ft_page.floating_action_button = ft.FloatingActionButton(
+            icon=ft.icons.ADD,
+        )
+        self.page.update()
+
+        if len(controls) > 1:
+            content = ft.Column(
+                controls=controls,
+                alignment=ft.MainAxisAlignment.CENTER,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER
+            )
+        else:
+            content = controls[0]
+
+        self.background = self.background or ft.Container(
+            image_src=self.page.session["background"],
             image_fit=ft.ImageFit.COVER,
             expand=True,
             content=content
-        ),
-    ]
-    return ft.View(controls=controls, padding=0, **kwargs)
+        )
+
+        controls = [
+            self.background,
+        ]
+
+        return ft.View(controls=controls, padding=0, **kwargs)
 
 
 if __name__ == '__main__':
@@ -132,7 +172,7 @@ if __name__ == '__main__':
 
     main = GenericApp(
         view=lambda page: home(page, test_pods),
-        view_factory=get_view
+        view_factory=ViewFactory
     )
 
     ft.app(
