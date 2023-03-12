@@ -100,12 +100,11 @@ class ViewFactory(GenericViewFactory):
         )
 
         for img_file in assets_dir("backgrounds"):
-            print(f"show: {img_file.name}")
             item = ft.PopupMenuItem(
                 content=ft.Image(
                     src=f"/backgrounds/{img_file.name}",
-                    width=300,
-                    height=200
+                    width=240,
+                    height=180
                 ),
                 on_click=self.get_on_select(img_file.name)
             )
@@ -122,9 +121,6 @@ class ViewFactory(GenericViewFactory):
 
         if "background" not in self.page.session:
             self.page.session["background"] = "/backgrounds/background22.png"
-
-        for img_file in assets_dir("backgrounds"):
-            print(f"img: {img_file.name}")
 
         self.page.ft_page.floating_action_button = ft.FloatingActionButton(
             icon=ft.icons.ADD,
