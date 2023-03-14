@@ -6,7 +6,7 @@ import io
 query_response = requests.post(
     "https://api.deepai.org/api/steampunk-generator",
     data={
-        'text': 'Green Cloud Technology. This is just the first step but looks very promising.',
+        'text': 'background, light, hairdresser, beauty',
         'grid_size': "1"
     },
     headers={'api-key': config.DEEP_AI_API_KEY}

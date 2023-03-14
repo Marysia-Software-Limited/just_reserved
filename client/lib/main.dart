@@ -17,10 +17,8 @@ void main([List<String>? args]) async {
   var pageUrl = Uri.base.toString();
   var assetsDir = "";
 
-  if (kDebugMode) {
-    pageUrl = "http://94.23.247.130:8550"; // ala.marysia.app application
-    // pageUrl = "http://192.168.50.101:8550"; // my local computer
-  }
+  pageUrl = "http://94.23.247.130:8550"; // ala.marysia.app application
+  // pageUrl = "http://192.168.50.101:8550"; // my local computer
 
   if (kIsWeb) {
     debugPrint("Flet View is running in Web mode");

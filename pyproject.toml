@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "just-reserved"
-version = "0.1.0"
+version = "1.0.5"
 description = ""
 authors = ["Adam Beret Manczuk <beret@hipisi.org.pl>"]
 readme = "README.md"
@@ -23,6 +23,15 @@ flet-django = { git = "https://github.com/Marysia-Software-Limited/flet-django.g
 beret-utils = "^0.4.8"
 requests = "^2.28.2"
 pillow = "^9.4.0"
+django-cms = "^3.11.1"
+djangocms-link = "^3.1.1"
+djangocms-file = "^3.0.0"
+djangocms-picture = "^4.0.0"
+djangocms-video = "^3.0.0"
+djangocms-googlemap = "^2.0.0"
+djangocms-snippet = "^3.1.0"
+djangocms-style = "^3.0.0"
+django-sekizai = "^4.0.0"
 
 
 [tool.poetry.dev-dependencies]
