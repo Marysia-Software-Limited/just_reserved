@@ -12,7 +12,7 @@ from pods.models import Pod
 from utils import time_str, date_str
 
 EXPIRE_MINUTES = 30
-DOMAIN = "http://ala.marysia.app"
+DOMAIN = "http://ala.hipisi.org.pl:8551"
 
 
 class Booking(models.Model):

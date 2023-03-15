@@ -1,7 +1,6 @@
-<div>
-    <img src="logo.png" />
-    <div><a href={{ domain }}{% url 'activate' token=booking.token %}">
-    Potwierdź swoją rezerwację {{ booking.pod }} na {{ booking.term_str }}.</a></div>
-    <div><a href={{ domain }}{% url 'delete' token=booking.token %}">
-    Usuń swoją rezerwację {{ booking.pod }} na {{ booking.term_str }} jeżeli zmieniłeś zdanie.</a></div>
-</div>
+<ul>
+    <li><a href={{ domain }}{% url 'activate' token=booking.token %}">
+    Confirm your reservation for {{ booking.pod }} at {{ booking.term_str }}.</a></li>
+    <li><a href={{ domain }}{% url 'delete' token=booking.token %}">
+    Delete your reservation for {{ booking.pod }} at {{ booking.term_str }} if you change your mind.</a></li>
+</ul>

@@ -129,7 +129,7 @@ class ViewFactory(GenericViewFactory):
     def get_view(self, controls, **kwargs):
 
         if "background" not in self.page.session:
-            self.page.session["background"] = "/backgrounds/background22.png"
+            self.page.session["background"] = "/backgrounds/bac10.png"
 
         self.page.ft_page.floating_action_button = ft.FloatingActionButton(
             icon=ft.icons.ADD,
