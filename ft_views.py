@@ -84,11 +84,12 @@ class ViewFactory(GenericViewFactory):
 
     def set_background(self, file_name):
 
-        backgrounds = assets_dir("backgrounds")
-        if file_name in backgrounds:
-            self.page.session["background"] = f"/backgrounds/{file_name}"
-        else:
-            self.page.session["background"] = f"/thumbails/{file_name}"
+        # backgrounds = assets_dir("backgrounds")
+        # if file_name in backgrounds:
+        #     self.page.session["background"] = f"/backgrounds/{file_name}"
+        # else:
+        #     self.page.session["background"] = f"/thumbails/{file_name}"
+        self.page.session["background"] = f"/backgrounds/{file_name}"
 
         self.background.image_src = self.page.session["background"]
         self.background.update()
@@ -111,8 +112,8 @@ class ViewFactory(GenericViewFactory):
             item = ft.PopupMenuItem(
                 content=ft.Image(
                     src=f"/thumbails/{img_file.name}",
-                    width=240,
-                    height=180
+                    width=300,
+                    height=200
                 ),
                 on_click=self.get_on_select(img_file.name)
             )

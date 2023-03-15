@@ -74,7 +74,7 @@ class CalendarControl(ft.UserControl):
 
     def in_range(self, _date: AnyDate):
         if self.max_date and \
-                day(_date) + timedelta(days=7-_date.weekday()) > day(self.max_date):
+                day(_date) + timedelta(days=7 - _date.weekday()) > day(self.max_date):
             return False
         if self.min_date and \
                 day(_date) - timedelta(days=_date.weekday()) < day(self.min_date):
@@ -86,8 +86,7 @@ class CalendarControl(ft.UserControl):
 
     def equal_day(self, _date: AnyDate):
         return equal_day(self.date, _date)
-    
-    
+
     def get_button(self):
         return ft.ElevatedButton()
 
@@ -102,7 +101,7 @@ class CalendarControl(ft.UserControl):
             return button
 
         on_select = self.on_select(_date)
-        
+
         if on_select:
             def __click_wrapper(e):
                 posteriori = on_select(e)
@@ -112,6 +111,7 @@ class CalendarControl(ft.UserControl):
                     self.update()
                 if callable(posteriori):
                     posteriori()
+
             button.on_click = __click_wrapper
         else:
             button.disabled = True
@@ -132,7 +132,7 @@ class CalendarControl(ft.UserControl):
                 self.day_button(_date)
             ],
             horizontal_alignment=ft.alignment.center,
-            alignment=ft.MainAxisAlignment.SPACE_EVENLY,
+            alignment=ft.MainAxisAlignment.SPACE_AROUND,
         )
 
     def set_days(self):
@@ -152,7 +152,9 @@ class CalendarControl(ft.UserControl):
 
         next_button = ft.IconButton(
             icon=ft.icons.CHEVRON_RIGHT,
-            disabled=True
+            disabled=True,
+            bgcolor=ft.colors.SECONDARY,
+            icon_color=ft.colors.BACKGROUND
         )
         next_date = self.date + timedelta(days=7)
         if self.in_range(next_date):
@@ -166,7 +168,9 @@ class CalendarControl(ft.UserControl):
 
         prev_button = ft.IconButton(
             icon=ft.icons.CHEVRON_LEFT,
-            disabled=True
+            disabled=True,
+            bgcolor=ft.colors.SECONDARY,
+            icon_color=ft.colors.BACKGROUND
         )
         prev_date = self.date - timedelta(days=7)
         if self.in_range(prev_date):
@@ -180,7 +184,7 @@ class CalendarControl(ft.UserControl):
 
         control_row = ft.Row(
             [prev_button, self.date_label, next_button],
-            alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+            alignment=ft.MainAxisAlignment.SPACE_AROUND
         )
 
         container = ft.Container(

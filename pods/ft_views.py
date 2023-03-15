@@ -30,7 +30,7 @@ def calendar(page, pod_id, service_id, start_date=datetime.now()):
     pod = Pod.objects.get(pk=pod_id)
     service = Service.objects.get(pk=service_id)
     calendar_slots = ft.Row(
-            expand=1,
+            # expand=1,
             wrap=True,
         )
 
@@ -100,6 +100,14 @@ def calendar(page, pod_id, service_id, start_date=datetime.now()):
         initial_date=start_date,
     )
     _calendar_control.on_select = on_day_selected
+
+    calendar_title_text = ft.Text(
+            pod,
+            font_family="Consolas",
+            text_align=ft.TextAlign.CENTER,
+            color=ft.colors.BLACK,
+        )
+
     calendar_title_row = ft.Row(
         controls=[
             ft.Text(
@@ -111,18 +119,33 @@ def calendar(page, pod_id, service_id, start_date=datetime.now()):
     )
 
     controls = [
-        calendar_title_row,
+        calendar_title_text,
         _calendar_control,
         calendar_slots,
     ]
 
     column = ft.Column(
         controls=controls,
-        # scroll=ft.ScrollMode.AUTO,
+        scroll=ft.ScrollMode.AUTO,
         alignment=ft.MainAxisAlignment.START,
         horizontal_alignment=ft.CrossAxisAlignment.CENTER
     )
 
+    calendar_content = ft.Container(
+        content=column,
+        padding=50,
+        # margin=ft.margin.symmetric(horizontal=50),
+        # gradient=ft.LinearGradient(
+        #     begin=ft.alignment.top_center,
+        #     end=ft.alignment.bottom_center,
+        #     colors=[ft.colors.WHITE54, ft.colors.BLUE_GREY_400],
+        # ),
+        # border=ft.border.all(1, ft.colors.RED),
+        width=600,
+        # opacity=1,
+        # border_radius=20,
+    )
+
     return page.get_view(
-        controls=[column],
+        controls=[calendar_content],
     )
