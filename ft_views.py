@@ -117,15 +117,9 @@ class ViewFactory(GenericViewFactory):
         img.save(th_file_path, "JPEG")
 
     def set_background(self, file_name):
+        self.bg_img = file_name
 
-        # backgrounds = assets_dir("backgrounds")
-        # if file_name in backgrounds:
-        #     self.page.session["background"] = f"/backgrounds/{file_name}"
-        # else:
-        #     self.page.session["background"] = f"/thumbails/{file_name}"
-        self.page.session["background"] = f"/backgrounds/{file_name}"
-
-        self.background.image_src = self.page.session["background"]
+        self.background.image_src = self.bg_img
         self.background.update()
 
     def get_on_select(self, file_name):
@@ -220,10 +214,17 @@ class ViewFactory(GenericViewFactory):
         app_bar.actions.append(self.select_background)
         return app_bar
 
-    def get_view(self, controls, **kwargs):
+    @property
+    def bg_img(self):
+        if not self.page.ft_page.client_storage.contains_key("background"):
+            self.page.ft_page.client_storage.set("background", "bac10.png")
+        return f"/backgrounds/{self.page.ft_page.client_storage.get('background')}"
 
-        if "background" not in self.page.session:
-            self.page.session["background"] = "/backgrounds/bac10.png"
+    @bg_img.setter
+    def bg_img(self, file_name):
+        self.page.ft_page.client_storage.set("background", file_name)
+
+    def get_view(self, controls, **kwargs):
 
         self.page.ft_page.floating_action_button = ft.FloatingActionButton(
             icon=ft.icons.ADD,
@@ -240,7 +241,7 @@ class ViewFactory(GenericViewFactory):
             content = controls[0]
 
         self.background = self.background or ft.Container(
-            image_src=self.page.session["background"],
+            image_src=self.bg_img,
             image_fit=ft.ImageFit.COVER,
             expand=True,
             content=content
