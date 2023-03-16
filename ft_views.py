@@ -1,9 +1,12 @@
 # This is a sample Python script.
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Optional
 
-# Press ⌃R to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
+from config import config
+import requests
+from PIL import Image
+import io
 
 import flet as ft
 from flet_django import GenericApp
@@ -82,6 +85,37 @@ def home(page: GenericPage, pods_qs=get_pods):
 class ViewFactory(GenericViewFactory):
     background: Optional[ft.Container] = None
 
+    def generate_background(self, desc):
+        query_response = requests.post(
+            "https://api.deepai.org/api/abstract-painting-generator",
+            data={
+                'text': f'background, light, {desc}',
+                'grid_size': "1"
+            },
+            headers={'api-key': config.DEEP_AI_API_KEY}
+        ).json()
+        print(query_response['output_url'])
+
+        thumbails = assets_dir("thumbails")
+        backgrounds = assets_dir("backgrounds")
+
+        file_name = f"{query_response['id']}-deepai.jpg"
+        bg_file_path = str(backgrounds(file_name))
+        th_file_path = str(thumbails(file_name))
+
+        download_response = requests.get(query_response['output_url'], allow_redirects=True)
+
+        open(bg_file_path, 'wb').write(download_response.content)
+
+        self.set_background(file_name)
+
+        img = Image.open(bg_file_path)
+
+        th_size = (300, 200)
+
+        img.thumbnail(th_size, Image.ANTIALIAS)
+        img.save(th_file_path, "JPEG")
+
     def set_background(self, file_name):
 
         # backgrounds = assets_dir("backgrounds")
@@ -102,8 +136,44 @@ class ViewFactory(GenericViewFactory):
 
     @property
     def select_background(self):
+
+        def close_dlg(e):
+            dlg_modal.open = False
+            self.page.update()
+
+        def yes_dlg(e):
+            desc = bg_desc.value
+            close_dlg(e)
+            self.generate_background(desc)
+
+        bg_desc = ft.TextField(label="Describe what You expect on Your new background.")
+
+        dlg_modal = ft.AlertDialog(
+            modal=True,
+            title=ft.Text("Create new background"),
+            content=bg_desc,
+            actions=[
+                ft.TextButton("Generate background", on_click=yes_dlg),
+                ft.TextButton("Cancel", on_click=close_dlg),
+            ],
+            actions_alignment=ft.MainAxisAlignment.END,
+            on_dismiss=lambda e: print("Modal dialog dismissed!"),
+        )
+
+        def open_dlg(e):
+            self.page.ft_page.dialog = dlg_modal
+            dlg_modal.open = True
+            self.page.update()
+
+        generate = ft.PopupMenuItem(
+            content=ft.Text("Generate new background"),
+            on_click=open_dlg
+        )
+
         __select_background = ft.PopupMenuButton(
-            items=[]
+            items=[
+                generate,
+            ]
         )
 
         thumbails = assets_dir("thumbails")

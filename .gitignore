@@ -1,8 +1,12 @@
 # Project specyfic ignores
 
+*-deepai.jpg
+*-deepai.png
+
 *.sqlite3
 .venv
 .idea
 .env
 *.lock
 /bower_components
+/assets/backgrounds/3b5f7be4-17b4-4315-b5cd-d2c0cf187042-deepai.jpg
