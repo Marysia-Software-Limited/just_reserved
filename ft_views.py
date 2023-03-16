@@ -85,9 +85,9 @@ def home(page: GenericPage, pods_qs=get_pods):
 class ViewFactory(GenericViewFactory):
     background: Optional[ft.Container] = None
 
-    def generate_background(self, desc):
+    def generate_background(self, desc, style):
         query_response = requests.post(
-            "https://api.deepai.org/api/abstract-painting-generator",
+            f"https://api.deepai.org/api/{style}",
             data={
                 'text': f'background, light, {desc}',
                 'grid_size': "1"
@@ -143,15 +143,39 @@ class ViewFactory(GenericViewFactory):
 
         def yes_dlg(e):
             desc = bg_desc.value
+            style = bg_style.value
             close_dlg(e)
-            self.generate_background(desc)
+            self.generate_background(desc, style)
 
         bg_desc = ft.TextField(label="Describe what You expect on Your new background.")
+        bg_style = ft.Dropdown(
+            label="Style",
+            hint_text="Select background style",
+            options=[
+                ft.dropdown.Option("abstract-painting-generator", text="Abstract Painting"),
+                ft.dropdown.Option("steampunk-generator", text="Steampunk"),
+                ft.dropdown.Option("cute-creature-generator", text="Cute Creature"),
+                ft.dropdown.Option("fantasy-world-generator", text="Fantasy"),
+                ft.dropdown.Option("cyberpunk-generator", text="Cyberpunk"),
+                ft.dropdown.Option("anime-portrait-generator", text="Portrait"),
+                ft.dropdown.Option("old-style-generator", text="Old Style"),
+                ft.dropdown.Option("watercolor-architecture-generator", text="Architecture"),
+                ft.dropdown.Option("text2img", text="Image"),
+            ]
+        )
+
+        modal_content = ft.Row(
+            controls=[
+                bg_desc,
+                bg_style
+            ],
+            wrap=True
+        )
 
         dlg_modal = ft.AlertDialog(
             modal=True,
             title=ft.Text("Create new background"),
-            content=bg_desc,
+            content=modal_content,
             actions=[
                 ft.TextButton("Generate background", on_click=yes_dlg),
                 ft.TextButton("Cancel", on_click=close_dlg),
