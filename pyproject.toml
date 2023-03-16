@@ -34,13 +34,14 @@ djangocms-style = "^3.0.0"
 django-sekizai = "^4.0.0"
 
 
+
 [tool.poetry.dev-dependencies]
 # for local development only
 #flet-core = {path = "../flet/sdk/python/packages/flet-core", develop = true}
 #flet = {path = "../flet/sdk/python/packages/flet", develop = true}
 #flet-django = {path = "../flet-django", develop = true}
 #flet-core = { subdirectory = "sdk/python/packages/flet-core", git = "https://github.com/Marysia-Software-Limited/flet.git", branch = "flet-django", develop = true}
-
+pylint = "^2.17.0"
 
 [build-system]
 requires = ["poetry-core"]
