@@ -7,7 +7,7 @@ from pods.models import Pod
 from flet_django.pages import GenericApp
 from flet_django.views import ft_view
 from flet_django.middlewares import simple_view_middleware
-from flet_django.navigation import Fatum
+from flet_django.navigation import Destiny
 
 from ft_views import home, ViewFactory
 
@@ -18,8 +18,8 @@ view_params = dict(app_bar_params=app_bar_params)
 
 main = fdj.GenericApp(
     destinations=[
-        fdj.Fatum("/", icon=ft.icons.HOME, label="home", action=False, nav_bar=True),
-        fdj.Fatum("/services", icon=ft.icons.LIST_SHARP, label="reservation", action=False, nav_bar=True)
+        fdj.Destiny("/", icon=ft.icons.HOME, label="home", action=False, nav_bar=True),
+        fdj.Destiny("/services", icon=ft.icons.LIST_SHARP, label="reservation", action=False, nav_bar=True)
     ],
     urls=[
         path("", home),

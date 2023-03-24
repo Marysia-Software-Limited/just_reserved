@@ -39,7 +39,7 @@ class BookingFormView(object):
     def bookings(self):
         return Booking.bookings(self.pod, self.date_start, self.date_end)
 
-    def get_form_view(self, page) -> ft.View:
+    def get_form_view(self, client) -> ft.View:
 
         self.buttons.controls = [
             ft.TextButton(_("Reject"), on_click=lambda _: self.close()),
@@ -58,8 +58,7 @@ class BookingFormView(object):
             content=column
         )]
 
-        return ft_view(
-            page,
+        return client.get_view(
             controls=controls,
         )
 
@@ -145,19 +144,19 @@ class BookingFormView(object):
         ]
         self.update()
 
-    def __call__(self, page: GenericPage):
-        self.page = page
-        return self.get_form_view(page)
+    def __call__(self, client: GenericClient):
+        self.client = client
+        return self.get_form_view(client)
 
     def close(self):
-        if self.page:
-            if self.page.dialog:
-                self.page.dialog.open = False
-            self.page.pop()
+        if self.client:
+            if self.client.dialog:
+                self.client.dialog.open = False
+            self.client.pop()
             # self.update()
 
     def update(self, *controls):
-        self.page.update(*controls)
+        self.client.update(*controls)
 
     def on_replace(self, booking: Booking):
         def __on_replace(*_):

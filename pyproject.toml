@@ -19,7 +19,7 @@ nltk = "^3.8.1"
 beautifulsoup4 = "^4.11.2"
 injector = "^0.20.1"
 flet = "^0.4.2"
-flet-django = { git = "https://github.com/Marysia-Software-Limited/flet-django.git", develop = true}
+#flet-django = { git = "https://github.com/Marysia-Software-Limited/flet-django.git", develop = true}
 beret-utils = "^0.4.8"
 requests = "^2.28.2"
 pillow = "^9.4.0"
@@ -32,6 +32,7 @@ djangocms-googlemap = "^2.0.0"
 djangocms-snippet = "^3.1.0"
 djangocms-style = "^3.0.0"
 django-sekizai = "^4.0.0"
+openai = "^0.27.2"
 
 
 
@@ -39,7 +40,7 @@ django-sekizai = "^4.0.0"
 # for local development only
 #flet-core = {path = "../flet/sdk/python/packages/flet-core", develop = true}
 #flet = {path = "../flet/sdk/python/packages/flet", develop = true}
-#flet-django = {path = "../flet-django", develop = true}
+flet-django = {path = "../flet-django", develop = true}
 #flet-core = { subdirectory = "sdk/python/packages/flet-core", git = "https://github.com/Marysia-Software-Limited/flet.git", branch = "flet-django", develop = true}
 pylint = "^2.17.0"
 

@@ -1,7 +1,11 @@
 # This is a sample Python script.
+import os
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
+from urllib.parse import urlparse
+
+import openai as openai
 
 from config import config
 import requests
@@ -10,7 +14,7 @@ import io
 
 import flet as ft
 from flet_django import GenericApp
-from flet_django import GenericPage
+from flet_django import GenericClient
 from flet_django import GenericViewFactory
 
 from config import assets_dir
@@ -21,7 +25,7 @@ def get_pods():
     return Pod.objects.all()
 
 
-def home(page: GenericPage, pods_qs=get_pods):
+def home(client: GenericClient, pods_qs=get_pods):
     text = ft.Container(
         content=ft.Text(
             "This is not a regular app, like many others. This application is the first ever created and published in the newest, revolutionary Green Cloud Technology. Our outstanding Marysia Software team found a way to connect two well-established environments - Phyton -Django- and Dart -Flutter. It's just the first step, but the journey looks very promising. Try our Reservation App Demo and find out more on www.marysia.app.",
@@ -60,7 +64,7 @@ def home(page: GenericPage, pods_qs=get_pods):
         button = ft.ElevatedButton(
             pod.name,
             icon=ft.icons.CALENDAR_VIEW_WEEK,
-            on_click=lambda _: page.go(calendar_url),
+            on_click=lambda _: client.go(calendar_url),
         )
         if pod.label:
             button.tooltip = pod.label
@@ -77,33 +81,71 @@ def home(page: GenericPage, pods_qs=get_pods):
         alignment=ft.MainAxisAlignment.END,
         horizontal_alignment=ft.CrossAxisAlignment.CENTER
     )
-    return page.get_view(
+    return client.get_view(
         controls=[column],
     )
+
+
+AI_IMG_STYLES = {
+    "openai": "Free Creation",
+    "abstract-painting-generator": "Abstract Painting",
+    "steampunk-generator": "Steampunk",
+    "cute-creature-generator": "Cute Creature",
+    "fantasy-world-generator": "Fantasy",
+    "cyberpunk-generator": "Cyberpunk",
+    "anime-portrait-generator": "Portrait",
+    "old-style-generator": "Old Style",
+    "watercolor-architecture-generator": "Architecture",
+    "text2img": "Image",
+}
+
+
+def openai_img_url(desc: str):
+    openai.api_key = config.OPENAI_KEY
+
+    query_response = openai.Image.create(
+        prompt=f'{desc}',
+        n=1,
+        size="512x512"
+    )
+    return query_response['data'][0]['url']
+
+
+def deepapi_img_url(desc: str, style: str):
+    query_response = requests.post(
+        f"https://api.deepai.org/api/{style}",
+        data={
+            'text': f'background, light, {desc}',
+            'grid_size': "1"
+        },
+        headers={'api-key': config.DEEP_AI_API_KEY}
+    ).json()
+    return query_response['output_url']
 
 
 class ViewFactory(GenericViewFactory):
     background: Optional[ft.Container] = None
 
     def generate_background(self, desc, style):
-        query_response = requests.post(
-            f"https://api.deepai.org/api/{style}",
-            data={
-                'text': f'background, light, {desc}',
-                'grid_size': "1"
-            },
-            headers={'api-key': config.DEEP_AI_API_KEY}
-        ).json()
-        print(query_response['output_url'])
+
+
+        try:
+            if style == "openai":
+                query_response_url = openai_img_url(desc)
+            else:
+                query_response_url = deepapi_img_url(desc, style)
+        except Exception as _:
+            return
+
+        file_name = os.path.basename(urlparse(query_response_url).path)
 
         thumbails = assets_dir("thumbails")
         backgrounds = assets_dir("backgrounds")
 
-        file_name = f"{query_response['id']}-deepai.jpg"
         bg_file_path = str(backgrounds(file_name))
         th_file_path = str(thumbails(file_name))
 
-        download_response = requests.get(query_response['output_url'], allow_redirects=True)
+        download_response = requests.get(query_response_url, allow_redirects=True)
 
         open(bg_file_path, 'wb').write(download_response.content)
 
@@ -133,7 +175,7 @@ class ViewFactory(GenericViewFactory):
 
         def close_dlg(e):
             dlg_modal.open = False
-            self.page.update()
+            self.client.update()
 
         def yes_dlg(e):
             desc = bg_desc.value
@@ -146,15 +188,7 @@ class ViewFactory(GenericViewFactory):
             label="Style",
             hint_text="Select background style",
             options=[
-                ft.dropdown.Option("abstract-painting-generator", text="Abstract Painting"),
-                ft.dropdown.Option("steampunk-generator", text="Steampunk"),
-                ft.dropdown.Option("cute-creature-generator", text="Cute Creature"),
-                ft.dropdown.Option("fantasy-world-generator", text="Fantasy"),
-                ft.dropdown.Option("cyberpunk-generator", text="Cyberpunk"),
-                ft.dropdown.Option("anime-portrait-generator", text="Portrait"),
-                ft.dropdown.Option("old-style-generator", text="Old Style"),
-                ft.dropdown.Option("watercolor-architecture-generator", text="Architecture"),
-                ft.dropdown.Option("text2img", text="Image"),
+                ft.dropdown.Option(name, text=label) for name, label in AI_IMG_STYLES.items()
             ]
         )
 
@@ -179,9 +213,9 @@ class ViewFactory(GenericViewFactory):
         )
 
         def open_dlg(e):
-            self.page.ft_page.dialog = dlg_modal
+            self.client.page.dialog = dlg_modal
             dlg_modal.open = True
-            self.page.update()
+            self.client.update()
 
         generate = ft.PopupMenuItem(
             content=ft.Text("Generate new background"),
@@ -216,34 +250,36 @@ class ViewFactory(GenericViewFactory):
 
     @property
     def bg_img(self):
-        if not self.page.ft_page.client_storage.contains_key("background"):
-            self.page.ft_page.client_storage.set("background", "bac10.png")
-        return f"/backgrounds/{self.page.ft_page.client_storage.get('background')}"
+        if not self.client.page.client_storage.contains_key("background"):
+            self.client.page.client_storage.set("background", "bac10.png")
+        return f"/backgrounds/{self.client.page.client_storage.get('background')}"
 
     @bg_img.setter
     def bg_img(self, file_name):
-        self.page.ft_page.client_storage.set("background", file_name)
+        self.client.page.client_storage.set("background", file_name)
 
     def get_view(self, controls, **kwargs):
 
-        self.page.ft_page.floating_action_button = ft.FloatingActionButton(
+        self.client.page.floating_action_button = ft.FloatingActionButton(
             icon=ft.icons.ADD,
         )
-        self.page.update()
+        self.client.update()
 
         if len(controls) > 1:
-            content = ft.Column(
+            content = ft.Row(
                 controls=controls,
                 alignment=ft.MainAxisAlignment.CENTER,
-                horizontal_alignment=ft.CrossAxisAlignment.CENTER
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                wrap=True
             )
         else:
             content = controls[0]
 
-        self.background = self.background or ft.Container(
+        self.background = ft.Container(
             image_src=self.bg_img,
             image_fit=ft.ImageFit.COVER,
             expand=True,
+            border=ft.border.all(1, ft.colors.RED),
             content=content
         )
 
@@ -271,7 +307,7 @@ if __name__ == '__main__':
 
 
     main = GenericApp(
-        view=lambda page: home(page, test_pods),
+        view=lambda client: home(client, test_pods),
         view_factory=ViewFactory
     )
 
