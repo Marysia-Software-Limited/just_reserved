@@ -26,13 +26,39 @@ def get_pods():
 
 
 def home(client: GenericClient, pods_qs=get_pods):
-    text = ft.Container(
-        content=ft.Text(
+
+    text_content = ft.Text(
             "This is not a regular app, like many others. This application is the first ever created and published in the newest, revolutionary Green Cloud Technology. Our outstanding Marysia Software team found a way to connect two well-established environments - Phyton -Django- and Dart -Flutter. It's just the first step, but the journey looks very promising. Try our Reservation App Demo and find out more on www.marysia.app.",
             font_family="Consolas",
             text_align=ft.TextAlign.CENTER,
             color=ft.colors.BLACK,
-        ),
+        )
+
+    def on_text_change(e):
+        text_content.value = text_edit.value
+        text_content.update()
+
+    text_edit = ft.TextField(
+        value=text_content.value,
+        on_change=on_text_change
+    )
+
+    bs_edit = ft.Row(
+        wrap=True,
+        controls=[
+            text_edit,
+            ft.ElevatedButton(
+                text="Finish Editing",
+                on_click=lambda _: client.bs.hide()
+            )
+        ]
+    )
+
+    def open_edit(*_):
+        client.bs = bs_edit
+
+    text = ft.Container(
+        content=text_content,
         padding=50,
         margin=ft.margin.symmetric(horizontal=50),
         gradient=ft.LinearGradient(
@@ -44,6 +70,7 @@ def home(client: GenericClient, pods_qs=get_pods):
         width=600,
         opacity=1,
         border_radius=20,
+        on_click=open_edit
     )
 
     controls = []
@@ -128,7 +155,6 @@ class ViewFactory(GenericViewFactory):
 
     def generate_background(self, desc, style):
 
-
         try:
             if style == "openai":
                 query_response_url = openai_img_url(desc)
@@ -171,25 +197,42 @@ class ViewFactory(GenericViewFactory):
         return __wrap_click
 
     @property
+    def edit_page(self):
+        return ft.IconButton(
+            icon=ft.icons.MODE_EDIT,
+            tooltip="Edit page"
+        )
+
+    @property
+    def add_page(self):
+        return ft.IconButton(
+            icon=ft.icons.ADD_CARD,
+            tooltip="Add new page"
+        )
+
+    @property
     def select_background(self):
 
-        def close_dlg(e):
-            dlg_modal.open = False
-            self.client.update()
-
-        def yes_dlg(e):
+        def yes_dlg(_):
             desc = bg_desc.value
             style = bg_style.value
-            close_dlg(e)
+            self.client.dialog.hide()
             self.generate_background(desc, style)
+
+        generate_button = ft.TextButton("Generate background", on_click=yes_dlg, disabled=True)
+
+        def on_change(_):
+            generate_button.disabled = False
+            self.client.update()
 
         bg_desc = ft.TextField(label="Describe what You expect on Your new background.")
         bg_style = ft.Dropdown(
-            label="Style",
+            label="Select style",
             hint_text="Select background style",
             options=[
                 ft.dropdown.Option(name, text=label) for name, label in AI_IMG_STYLES.items()
-            ]
+            ],
+            on_change=on_change
         )
 
         modal_content = ft.Row(
@@ -200,22 +243,18 @@ class ViewFactory(GenericViewFactory):
             wrap=True
         )
 
-        dlg_modal = ft.AlertDialog(
-            modal=True,
-            title=ft.Text("Create new background"),
-            content=modal_content,
-            actions=[
-                ft.TextButton("Generate background", on_click=yes_dlg),
-                ft.TextButton("Cancel", on_click=close_dlg),
-            ],
-            actions_alignment=ft.MainAxisAlignment.END,
-            on_dismiss=lambda e: print("Modal dialog dismissed!"),
-        )
+        modal_actions = [
+            generate_button,
+            ft.TextButton("Cancel", on_click=lambda _: self.client.dialog.hide()),
+        ]
 
         def open_dlg(e):
-            self.client.page.dialog = dlg_modal
-            dlg_modal.open = True
-            self.client.update()
+            self.client.update_dialog(
+                modal_content,
+                modal_actions,
+                show=True,
+                title="Describe Your Background"
+            )
 
         generate = ft.PopupMenuItem(
             content=ft.Text("Generate new background"),
@@ -225,7 +264,12 @@ class ViewFactory(GenericViewFactory):
         __select_background = ft.PopupMenuButton(
             items=[
                 generate,
-            ]
+            ],
+
+            content=ft.Icon(
+                name=ft.icons.EDIT_DOCUMENT,
+                tooltip="Edit background"
+            ),
         )
 
         thumbails = assets_dir("thumbails")
@@ -246,6 +290,8 @@ class ViewFactory(GenericViewFactory):
     def app_bar_factory(self, **app_bar_params):
         app_bar = super().app_bar_factory(**app_bar_params)
         app_bar.actions.append(self.select_background)
+        app_bar.actions.append(self.edit_page)
+        app_bar.actions.append(self.add_page)
         return app_bar
 
     @property
@@ -260,18 +306,41 @@ class ViewFactory(GenericViewFactory):
 
     def get_view(self, controls, **kwargs):
 
-        self.client.page.floating_action_button = ft.FloatingActionButton(
-            icon=ft.icons.ADD,
+        # self.client.page.floating_action_button = ft.FloatingActionButton(
+        #     icon=ft.icons.ADD,
+        # )
+        # self.client.update()
+
+        self.client.page.theme = ft.Theme(
+            font_family="Consolas",
+            color_scheme_seed=ft.colors.GREEN
         )
-        self.client.update()
 
         if len(controls) > 1:
-            content = ft.Row(
+            content_row = ft.Row(
                 controls=controls,
                 alignment=ft.MainAxisAlignment.CENTER,
-                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                wrap=True
+                scroll=ft.ScrollMode.AUTO,
+                vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                wrap=True,
+                height=600
             )
+            content = ft.Container(
+                    content=content_row,
+                    # padding=50,
+                    margin=20,
+                    gradient=ft.LinearGradient(
+                        begin=ft.alignment.top_center,
+                        end=ft.alignment.bottom_center,
+                        colors=[ft.colors.WHITE54, ft.colors.BLUE_GREY_400],
+                    ),
+                    border=ft.border.all(1, ft.colors.BLUE),
+                    width=600,
+                    height=640,
+                    opacity=1,
+                    border_radius=20,
+                    alignment=ft.alignment.center
+                )
         else:
             content = controls[0]
 
@@ -280,7 +349,8 @@ class ViewFactory(GenericViewFactory):
             image_fit=ft.ImageFit.COVER,
             expand=True,
             border=ft.border.all(1, ft.colors.RED),
-            content=content
+            content=content,
+            alignment=ft.alignment.center
         )
 
         controls = [

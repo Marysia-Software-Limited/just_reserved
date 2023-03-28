@@ -25,7 +25,7 @@ def _print_date(_date: AnyDate):
 class CalendarControl(ft.UserControl):
     def __init__(self,
                  initial_date,
-                 cell_width: int = 60,
+                 cell_width: int = 30,
                  on_select: Optional[
                      Callable[
                          [AnyDate],
@@ -64,10 +64,13 @@ class CalendarControl(ft.UserControl):
         self.on_select = on_select or _print_date
         self.cell_width = cell_width
         self.date_label = ft.Text(
-            text_align=ft.TextAlign.CENTER
+            text_align=ft.TextAlign.CENTER,
+            color=ft.colors.BLACK,
+            size=18
         )
         self.week_row = ft.Row(
-            alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+            alignment=ft.MainAxisAlignment.SPACE_AROUND,
+            auto_scroll=True
         )
         self.date = initial_date
         self.get_date = check_date or (lambda _date: True)
@@ -92,11 +95,33 @@ class CalendarControl(ft.UserControl):
 
     def day_button(self, _date: AnyDate):
         button = self.get_button()
-        button.text = _date.strftime("%d")
+        # button.text = _date.strftime("%d")
+        button.content = ft.Column(
+            controls=[
+                ft.Text(
+                    _date.strftime("%a"),
+                    text_align=ft.TextAlign.CENTER,
+                    no_wrap=True,
+                    # color=ft.colors.BLACK,
+                    width=self.cell_width,
+                ),
+                ft.Text(
+                    _date.strftime("%d"),
+                    text_align=ft.TextAlign.CENTER,
+                    no_wrap=True,
+                    # color=ft.colors.BLACK,
+                    width=self.cell_width,
+                ),
+            ],
+            horizontal_alignment=ft.alignment.center,
+            alignment=ft.MainAxisAlignment.SPACE_AROUND,
+        )
 
         if self.equal_day(_date):
-            button.bgcolor = ft.colors.SECONDARY
-            button.color = ft.colors.BACKGROUND
+            # button.bgcolor = ft.colors.SECONDARY
+            # button.color = ft.colors.BACKGROUND
+            button.color = ft.colors.BLACK
+            button.bgcolor = ft.colors.AMBER_100
             button.disabled = True
             return button
 
@@ -115,6 +140,8 @@ class CalendarControl(ft.UserControl):
             button.on_click = __click_wrapper
         else:
             button.disabled = True
+            button.color = ft.colors.BLACK
+            button.bgcolor = ft.colors.AMBER_100
 
         return button
 
@@ -125,7 +152,7 @@ class CalendarControl(ft.UserControl):
                     _date.strftime("%a"),
                     text_align=ft.TextAlign.CENTER,
                     no_wrap=True,
-                    color=ft.colors.ON_SURFACE_VARIANT,
+                    color=ft.colors.BLACK,
                     width=cell_width,
                     # expand=True
                 ),
@@ -141,7 +168,7 @@ class CalendarControl(ft.UserControl):
 
         for day in week_range(self.date):
             if self.check_day(day):
-                week_days.append(self.day_row_cell(day, self.cell_width))
+                week_days.append(self.day_button(day))
                 last_day = day
 
         self.date_label.value = last_day.strftime("%B %Y")
@@ -153,8 +180,10 @@ class CalendarControl(ft.UserControl):
         next_button = ft.IconButton(
             icon=ft.icons.CHEVRON_RIGHT,
             disabled=True,
-            bgcolor=ft.colors.SECONDARY,
-            icon_color=ft.colors.BACKGROUND
+            icon_color=ft.colors.BLACK,
+            bgcolor=ft.colors.AMBER_100,
+            # bgcolor=ft.colors.SECONDARY,
+            # icon_color=ft.colors.BACKGROUND
         )
         next_date = self.date + timedelta(days=7)
         if self.in_range(next_date):
@@ -169,8 +198,10 @@ class CalendarControl(ft.UserControl):
         prev_button = ft.IconButton(
             icon=ft.icons.CHEVRON_LEFT,
             disabled=True,
-            bgcolor=ft.colors.SECONDARY,
-            icon_color=ft.colors.BACKGROUND
+            icon_color=ft.colors.BLACK,
+            bgcolor=ft.colors.AMBER_100,
+            # bgcolor=ft.colors.SECONDARY,
+            # icon_color=ft.colors.BACKGROUND
         )
         prev_date = self.date - timedelta(days=7)
         if self.in_range(prev_date):
