@@ -106,17 +106,18 @@ def calendar(client: GenericClient, pod_id, service_id, start_date=datetime.now(
             font_family="Consolas",
             text_align=ft.TextAlign.CENTER,
             color=ft.colors.BLACK,
+            size=22,
         )
 
-    calendar_title_row = ft.Row(
-        controls=[
-            ft.Text(
-                pod,
-                text_align=ft.TextAlign.CENTER
-            )
-        ],
-        vertical_alignment=ft.alignment.center
-    )
+    # calendar_title_row = ft.Row(
+    #     controls=[
+    #         ft.Text(
+    #             pod,
+    #             text_align=ft.TextAlign.CENTER
+    #         )
+    #     ],
+    #     vertical_alignment=ft.alignment.center
+    # )
 
     controls = [
         calendar_title_text,
@@ -147,5 +148,5 @@ def calendar(client: GenericClient, pod_id, service_id, start_date=datetime.now(
     )
 
     return client.get_view(
-        controls=[calendar_content],
+        controls=controls,
     )

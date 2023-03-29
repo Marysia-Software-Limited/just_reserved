@@ -1,6 +1,9 @@
-<ul>
-    <li><a href={{ domain }}{% url 'activate' token=booking.token %}">
-    Confirm your reservation for {{ booking.pod }} at {{ booking.term_str }}.</a></li>
-    <li><a href={{ domain }}{% url 'delete' token=booking.token %}">
-    Delete your reservation for {{ booking.pod }} at {{ booking.term_str }} if you change your mind.</a></li>
-</ul>
+<h3>Welcome in Green Cloud Technology!</h3>
+
+<a href="https://marysia.app">
+    <img src="cid:{{ img_cid }}" alt="Tell me more about."/>
+</a>
+<hr />
+<a href="{{ domain }}{% url 'delete' token=booking.token %}">
+    Unsubscribe
+</a>

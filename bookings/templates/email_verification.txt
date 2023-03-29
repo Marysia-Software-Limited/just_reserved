@@ -1,0 +1,6 @@
+#Welcome in Green Cloud Technology!
+
+* Tell me more:
+    http://marysia.app
+* Unsubscribe:
+    {{ domain }}{% url 'delete' token=booking.token %}

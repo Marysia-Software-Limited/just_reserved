@@ -1,4 +1,6 @@
 from datetime import datetime, timedelta
+from email.mime.image import MIMEImage
+from email.utils import make_msgid
 from hashlib import md5
 
 from django.conf import settings
@@ -8,6 +10,7 @@ from django.db.models import Q
 from django.template.loader import render_to_string
 from nptime import nptime
 
+from config import base_dir
 from pods.models import Pod
 from utils import time_str, date_str
 
@@ -92,14 +95,31 @@ class Booking(models.Model):
 
     def _send_email_verification(self):
         domain = DOMAIN
-        subject = 'Aktywuj Rezerwację!'
-        body = render_to_string(
-            'email_verification.html',
-            {
+        subject = 'Welcome in Green Cloud Technology!'
+
+        image_path = base_dir("static", "email", "welcome_email.png")
+
+        img_cid = make_msgid()
+
+        context = {
                 'domain': domain,
                 'booking': self,
+                'img_cid': img_cid
             }
+        body_html = render_to_string(
+            'email_verification.html',
+            context
         )
-        email = EmailMessage(to=[self.email], subject=subject, body=body)
+        body_text = render_to_string(
+            'email_verification.txt',
+            context
+        )
+
+        email = EmailMessage(to=[self.email], subject=subject, body=body_html)
         email.content_subtype = "html"
+        with open(image_path, 'rb') as image:
+            mime_image = MIMEImage(image.read())
+            mime_image.add_header('Content-ID', f"<{img_cid}>")
+            email.attach(mime_image)
+
         email.send()
