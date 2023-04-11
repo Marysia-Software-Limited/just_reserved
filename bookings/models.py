@@ -115,7 +115,7 @@ class Booking(models.Model):
             context
         )
 
-        email = EmailMessage(to=[self.email], subject=subject, body=body_html)
+        email = EmailMessage(to=[self.email], subject=subject, body=body_html, from_email="info@marysia.app")
         email.content_subtype = "html"
         with open(image_path, 'rb') as image:
             mime_image = MIMEImage(image.read())

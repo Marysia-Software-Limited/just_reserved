@@ -36,7 +36,7 @@ class BookingFormView(object):
         self.__page: Optional[ft.Page] = None
         self.title: ft.Control = ft.Container(
             ft.Text(
-                _("Of course, it is just a dummy application - you won't reserve anything. There are different reasons to write down your email address. First of all - we want to keep you updated with our growing technology (it's changing fast, but we won't spam your mailbox), second - we want to be sure if you decide to build your app, you will have our contact just under your hand, and - last but not least - we will give you 25% off for your first application build with us. We respect your privacy, you can resign from receiving our newsletter anytime."),
+                _("Please enter your email and press the send button. You will receive a confirmation email with details on how to arrange a        meeting. We will need a bit more information before we contact you (your name, phone number, location, and type of business). You also will be added to our newsletter receiver list, where we will update our journey within Green Cloud Technology (you can unsubscribe anytime)."),
                 color=ft.colors.BLACK,
                 text_align=ft.TextAlign.CENTER,
                 size=18,

@@ -20,7 +20,7 @@ DEFAULT_CONFIG = (
     ('DJANGO_EMAIL_HOST_USER', 'just_reserved@marysia.app'),
     ('DJANGO_EMAIL_HOST_PASSWORD', 'key'),
     ('DEEP_AI_API_KEY', 'api-key'),
-    ("DJANGO_ALLOWED_HOSTS", "ala.hipisi.org.pl eskape.marysia.app localhost 94.23.247.130 0.0.0.0 127.0.0.1"),
+    ("DJANGO_ALLOWED_HOSTS", "ala.hipisi.org.pl eskape.marysia.app localhost 94.23.247.130 0.0.0.0 127.0.0.1 hipisi.org.pl"),
     ('OPENAI_KEY', 'api-key'),
     ('OPENAI_ORG', 'marysia'),
  )

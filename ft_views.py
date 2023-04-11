@@ -28,7 +28,7 @@ def get_pods():
 def home(client: GenericClient, pods_qs=get_pods):
 
     text_content = ft.Text(
-            "This is not a regular app, like many others. This application is the first ever created and published in the newest, revolutionary Green Cloud Technology. Our outstanding Marysia Software team found a way to connect two well-established environments - Phyton -Django- and Dart -Flutter. It's just the first step, but the journey looks very promising. Try our Reservation App Demo and find out more on www.marysia.app.",
+            "This is not a regular app, like many others. This application is the first ever created and published in the newest, revolutionary Green Cloud Technology. Our outstanding Marysia Software team found a way to connect two well-established environments Django, Flutter and one Python to rule them all. It's just the first step, but the journey looks very promising. Play with backgrounds, find what else can be edited and book your FREE, one-to-one consultation. Find more on https://www.marysia.app",
             font_family="Consolas",
             text_align=ft.TextAlign.CENTER,
             color=ft.colors.BLACK,
