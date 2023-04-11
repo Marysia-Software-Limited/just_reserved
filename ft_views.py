@@ -289,9 +289,13 @@ class ViewFactory(GenericViewFactory):
 
     def app_bar_factory(self, **app_bar_params):
         app_bar = super().app_bar_factory(**app_bar_params)
+        # app_bar.center_title = True
         app_bar.actions.append(self.select_background)
         # app_bar.actions.append(self.edit_page)
         # app_bar.actions.append(self.add_page)
+        app_bar.actions.append(ft.Container(
+            width=20
+        ))
         return app_bar
 
     @property
