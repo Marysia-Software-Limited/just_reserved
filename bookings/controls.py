@@ -26,40 +26,56 @@ class BookingFormView(object):
         self.email_input: ft.TextField = ft.TextField(
             keyboard_type=ft.KeyboardType.EMAIL,
             label=_("Email"),
-            helper_text=_("Enter the email address to save your reservation.")
+            helper_text=_("Enter your email address."),
+            color=ft.colors.BLACK,
+            content_padding=20
         )
         self.email_errors = ft.Markdown()
         self.message: ft.Control = ft.Text()
         self.__form_dialog: Optional[ft.AlertDialog] = None
         self.__page: Optional[ft.Page] = None
-        self.title: ft.Control = ft.Text(_("Enter your email for booking"))
+        self.title: ft.Control = ft.Container(
+            ft.Text(
+                _("Please enter your email and press the send button. You will receive a confirmation email with details on how to arrange a        meeting. We will need a bit more information before we contact you (your name, phone number, location, and type of business). You also will be added to our newsletter receiver list, where we will update our journey within Green Cloud Technology (you can unsubscribe anytime)."),
+                color=ft.colors.BLACK,
+                text_align=ft.TextAlign.CENTER,
+                size=18,
+                weight=ft.FontWeight.BOLD
+            ),
+            padding=20,
+            margin=20,
+            alignment=ft.alignment.center
+        )
         self.buttons: ft.Row = ft.Row()
 
     @property
     def bookings(self):
         return Booking.bookings(self.pod, self.date_start, self.date_end)
 
-    def get_form_view(self, page) -> ft.View:
+    def get_form_view(self, client) -> ft.View:
 
         self.buttons.controls = [
-            ft.TextButton(_("Reject"), on_click=lambda _: self.close()),
-            ft.TextButton(_("Reserve"), on_click=lambda _: self.submit()),
+            ft.ElevatedButton(_("Send"), on_click=lambda _: self.submit()),
+            ft.ElevatedButton(_("Cancel"), on_click=lambda _: self.close()),
         ]
         column = ft.Column(
             controls=[
-                self.title,
                 self.email_input,
                 self.email_errors,
                 self.message,
                 self.buttons
             ]
         )
-        controls = [ft.Container(
-            content=column
-        )]
+        controls = [
+            self.title,
+            ft.Container(
+                content=column,
+                padding=20,
+                margin=20
+            )
+        ]
 
-        return ft_view(
-            page,
+        return client.get_view(
             controls=controls,
         )
 
@@ -77,12 +93,12 @@ class BookingFormView(object):
                 email=form.cleaned_data["email"]
             )
 
-            bookings = self.bookings.filter(email=booking.email)
-            if bookings.count():
-                on_replace = self.on_replace(booking)
-                return self.alert_dialog(on_replace, bookings)
-            else:
-                self.save(booking)
+            # bookings = self.bookings.filter(email=booking.email)
+            # if bookings.count():
+            #     on_replace = self.on_replace(booking)
+            #     return self.alert_dialog(on_replace, bookings)
+            # else:
+            self.save(booking)
         else:
             email_html_error = form.errors.get("email")
 
@@ -90,43 +106,43 @@ class BookingFormView(object):
                 self.email_errors.value = email_html_error.as_text()
                 self.update()
 
-    def alert_dialog(self, on_replace, bookings):
-
-        messages = [_("What too much is not healthy.")]
-        word: str = _("You already have")
-        for booking in bookings:
-            messages.append(
-                _("{word} the execution reserved for {term}.").format(word=word, term=booking.term_str))
-            word = _("You have also")
-
-        messages.append(
-            _("Do you want to cancel this date and book a new one?"))
-
-        self.title.value = _("Decide man!")
-        self.message.value = " ".join(messages)
-        self.buttons.controls = [
-            ft.TextButton(_("Reject"), on_click=self.on_reset),
-            ft.TextButton(_("Replace"), on_click=on_replace),
-        ]
-
-        self.update()
+    # def alert_dialog(self, on_replace, bookings):
+    #
+    #     messages = [_("What too much is not healthy.")]
+    #     word: str = _("You already have")
+    #     for booking in bookings:
+    #         messages.append(
+    #             _("{word} the execution reserved for {term}.").format(word=word, term=booking.term_str))
+    #         word = _("You have also")
+    #
+    #     messages.append(
+    #         _("Do you want to cancel this date and book a new one?"))
+    #
+    #     self.title.value = _("Decide man!")
+    #     self.message.value = " ".join(messages)
+    #     self.buttons.controls = [
+    #         ft.TextButton(_("Reject"), on_click=self.on_reset),
+    #         ft.TextButton(_("Replace"), on_click=on_replace),
+    #     ]
+    #
+    #     self.update()
 
     def save(self, booking):
-        if booking.count < 1:
-            return self.message_dialog(
-                message=_("The term already reserved, try another!"),
-                title=_("Term is unavailable")
-            )
+        # if booking.count < 1:
+        #     return self.message_dialog(
+        #         message=_("The term already reserved, try another!"),
+        #         title=_("Term is unavailable")
+        #     )
         booking.save()
         # self.close()
-        message = _("""You reserved {pod} on the term {term}.
-        Confirm please within {expire} minutes by clicking on the link that you will find in an email sent to 
-         address {email}.
-        """).format(pod=self.pod, expire=EXPIRE_MINUTES, term=booking.term_str, email=booking.email)
-        self.message_dialog(
-            message=message,
-            title=_("We saved the reservation. We are waiting for confirmation.")
-        )
+        # message = _("""You reserved {pod} on the term {term}.
+        # Confirm please within {expire} minutes by clicking on the link that you will find in an email sent to
+        #  address {email}.
+        # """).format(pod=self.pod, expire=EXPIRE_MINUTES, term=booking.term_str, email=booking.email)
+        # self.message_dialog(
+        #     message=message,
+        #     title=_("We saved the reservation. We are waiting for confirmation.")
+        # )
 
     def message_dialog(
             self,
@@ -145,19 +161,19 @@ class BookingFormView(object):
         ]
         self.update()
 
-    def __call__(self, page: GenericPage):
-        self.page = page
-        return self.get_form_view(page)
+    def __call__(self, client: GenericClient):
+        self.client = client
+        return self.get_form_view(client)
 
     def close(self):
-        if self.page:
-            if self.page.dialog:
-                self.page.dialog.open = False
-            self.page.pop()
+        if self.client:
+            if self.client.dialog:
+                self.client.dialog.open = False
+            self.client.pop()
             # self.update()
 
     def update(self, *controls):
-        self.page.update(*controls)
+        self.client.update(*controls)
 
     def on_replace(self, booking: Booking):
         def __on_replace(*_):

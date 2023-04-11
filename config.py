@@ -19,7 +19,10 @@ DEFAULT_CONFIG = (
     ('SECRET_KEY', "django-insecure-aj#exo2bw$h%ps^hr4o+ch)e_u2ao1j19rd6z0q)l1o#e!9rn5"),
     ('DJANGO_EMAIL_HOST_USER', 'just_reserved@marysia.app'),
     ('DJANGO_EMAIL_HOST_PASSWORD', 'key'),
-    ('DEEP_AI_API_KEY', 'api-key')
+    ('DEEP_AI_API_KEY', 'api-key'),
+    ("DJANGO_ALLOWED_HOSTS", "ala.hipisi.org.pl eskape.marysia.app localhost 94.23.247.130 0.0.0.0 127.0.0.1 hipisi.org.pl"),
+    ('OPENAI_KEY', 'api-key'),
+    ('OPENAI_ORG', 'marysia'),
  )
 
 ENV_FILES = (

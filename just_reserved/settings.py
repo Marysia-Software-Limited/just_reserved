@@ -28,25 +28,48 @@ SECRET_KEY = 'django-insecure-1fr!@g7hjn^jc6*nxkgmrxbs01-@nm5$e15e*76m5&f#i7rzgg
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = config.DJANGO_ALLOWED_HOSTS.split(" ")
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    # Django CMS admin
+    'djangocms_admin_style',
+
+    # Django
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Flet
     'flet_django',
+
+    # extra dev tools
     'django_extensions',
+
+    # https://pypi.org/project/django-scheduler/
     'schedule',
-    # 'djangobower',
+
+    # Django CMS
+    'django.contrib.sites',
+    'cms',
+    'menus',
+    'treebeard',
+    # Django Sekizai is required by the CMS for static files management.
+    'sekizai',
+
+    # local apps
     'bookings',
     'pods',
 ]
+
+# https://data-flair.training/blogs/django-cms/
+# Site_id Setup
+SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -73,6 +96,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 "django.template.context_processors.request",
+                'sekizai.context_processors.sekizai',
             ],
         },
     },
@@ -114,7 +138,15 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGES = [
+    ('en', 'English'),
+    # ('pl', 'Polish'),
+    # ('ru', 'Russian'),
+    # ('de', 'German'),
+    # ('it', 'Italian')
+]
+
+LANGUAGE_CODE = 'en'
 
 TIME_ZONE = 'UTC'
 
@@ -157,4 +189,4 @@ EMAIL_HOST_USER = config.DJANGO_EMAIL_HOST_USER
 EMAIL_HOST_PASSWORD = config.DJANGO_EMAIL_HOST_PASSWORD
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = 'just_reserved@marysia.app'
+DEFAULT_FROM_EMAIL = 'info@marysia.app'

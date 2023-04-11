@@ -25,7 +25,7 @@ def _print_date(_date: AnyDate):
 class CalendarControl(ft.UserControl):
     def __init__(self,
                  initial_date,
-                 cell_width: int = 60,
+                 cell_width: int = 30,
                  on_select: Optional[
                      Callable[
                          [AnyDate],
@@ -64,17 +64,20 @@ class CalendarControl(ft.UserControl):
         self.on_select = on_select or _print_date
         self.cell_width = cell_width
         self.date_label = ft.Text(
-            text_align=ft.TextAlign.CENTER
+            text_align=ft.TextAlign.CENTER,
+            color=ft.colors.BLACK,
+            size=18
         )
         self.week_row = ft.Row(
-            alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+            alignment=ft.MainAxisAlignment.SPACE_AROUND,
+            auto_scroll=True
         )
         self.date = initial_date
         self.get_date = check_date or (lambda _date: True)
 
     def in_range(self, _date: AnyDate):
         if self.max_date and \
-                day(_date) + timedelta(days=7-_date.weekday()) > day(self.max_date):
+                day(_date) + timedelta(days=7 - _date.weekday()) > day(self.max_date):
             return False
         if self.min_date and \
                 day(_date) - timedelta(days=_date.weekday()) < day(self.min_date):
@@ -86,23 +89,44 @@ class CalendarControl(ft.UserControl):
 
     def equal_day(self, _date: AnyDate):
         return equal_day(self.date, _date)
-    
-    
+
     def get_button(self):
         return ft.ElevatedButton()
 
     def day_button(self, _date: AnyDate):
         button = self.get_button()
-        button.text = _date.strftime("%d")
+        # button.text = _date.strftime("%d")
+        button.content = ft.Column(
+            controls=[
+                ft.Text(
+                    _date.strftime("%a"),
+                    text_align=ft.TextAlign.CENTER,
+                    no_wrap=True,
+                    # color=ft.colors.BLACK,
+                    width=self.cell_width,
+                ),
+                ft.Text(
+                    _date.strftime("%d"),
+                    text_align=ft.TextAlign.CENTER,
+                    no_wrap=True,
+                    # color=ft.colors.BLACK,
+                    width=self.cell_width,
+                ),
+            ],
+            horizontal_alignment=ft.alignment.center,
+            alignment=ft.MainAxisAlignment.SPACE_AROUND,
+        )
 
         if self.equal_day(_date):
-            button.bgcolor = ft.colors.SECONDARY
-            button.color = ft.colors.BACKGROUND
+            # button.bgcolor = ft.colors.SECONDARY
+            # button.color = ft.colors.BACKGROUND
+            button.color = ft.colors.BLACK
+            button.bgcolor = ft.colors.AMBER_100
             button.disabled = True
             return button
 
         on_select = self.on_select(_date)
-        
+
         if on_select:
             def __click_wrapper(e):
                 posteriori = on_select(e)
@@ -112,9 +136,12 @@ class CalendarControl(ft.UserControl):
                     self.update()
                 if callable(posteriori):
                     posteriori()
+
             button.on_click = __click_wrapper
         else:
             button.disabled = True
+            button.color = ft.colors.BLACK
+            button.bgcolor = ft.colors.AMBER_100
 
         return button
 
@@ -125,14 +152,14 @@ class CalendarControl(ft.UserControl):
                     _date.strftime("%a"),
                     text_align=ft.TextAlign.CENTER,
                     no_wrap=True,
-                    color=ft.colors.ON_SURFACE_VARIANT,
+                    color=ft.colors.BLACK,
                     width=cell_width,
                     # expand=True
                 ),
                 self.day_button(_date)
             ],
             horizontal_alignment=ft.alignment.center,
-            alignment=ft.MainAxisAlignment.SPACE_EVENLY,
+            alignment=ft.MainAxisAlignment.SPACE_AROUND,
         )
 
     def set_days(self):
@@ -141,7 +168,7 @@ class CalendarControl(ft.UserControl):
 
         for day in week_range(self.date):
             if self.check_day(day):
-                week_days.append(self.day_row_cell(day, self.cell_width))
+                week_days.append(self.day_button(day))
                 last_day = day
 
         self.date_label.value = last_day.strftime("%B %Y")
@@ -152,7 +179,11 @@ class CalendarControl(ft.UserControl):
 
         next_button = ft.IconButton(
             icon=ft.icons.CHEVRON_RIGHT,
-            disabled=True
+            disabled=True,
+            icon_color=ft.colors.BLACK,
+            bgcolor=ft.colors.AMBER_100,
+            # bgcolor=ft.colors.SECONDARY,
+            # icon_color=ft.colors.BACKGROUND
         )
         next_date = self.date + timedelta(days=7)
         if self.in_range(next_date):
@@ -166,7 +197,11 @@ class CalendarControl(ft.UserControl):
 
         prev_button = ft.IconButton(
             icon=ft.icons.CHEVRON_LEFT,
-            disabled=True
+            disabled=True,
+            icon_color=ft.colors.BLACK,
+            bgcolor=ft.colors.AMBER_100,
+            # bgcolor=ft.colors.SECONDARY,
+            # icon_color=ft.colors.BACKGROUND
         )
         prev_date = self.date - timedelta(days=7)
         if self.in_range(prev_date):
@@ -180,7 +215,7 @@ class CalendarControl(ft.UserControl):
 
         control_row = ft.Row(
             [prev_button, self.date_label, next_button],
-            alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+            alignment=ft.MainAxisAlignment.SPACE_AROUND
         )
 
         container = ft.Container(

@@ -1,7 +1,9 @@
-<div>
-    <img src="logo.png" />
-    <div><a href={{ domain }}{% url 'activate' token=booking.token %}">
-    Potwierdź swoją rezerwację {{ booking.pod }} na {{ booking.term_str }}.</a></div>
-    <div><a href={{ domain }}{% url 'delete' token=booking.token %}">
-    Usuń swoją rezerwację {{ booking.pod }} na {{ booking.term_str }} jeżeli zmieniłeś zdanie.</a></div>
-</div>
+<h3>Welcome in Green Cloud Technology!</h3>
+
+<a href="https://marysia.app">
+    <img src="cid:{{ img_cid }}" alt="Tell me more about."/>
+</a>
+<hr />
+<a href="{{ domain }}{% url 'delete' token=booking.token %}">
+    Unsubscribe
+</a>
