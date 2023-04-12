@@ -13,6 +13,8 @@ from .models import Booking, EXPIRE_MINUTES
 
 
 class BookingFormView(object):
+    __send_button: Optional[ft.ElevatedButton] = None
+    __cancel_button: Optional[ft.ElevatedButton] = None
 
     def __init__(self, calendar_date, time: nptime, duration, pod):
         calendar_date = datetime(day=calendar_date.day, month=calendar_date.month, year=calendar_date.year)
@@ -52,11 +54,23 @@ class BookingFormView(object):
     def bookings(self):
         return Booking.bookings(self.pod, self.date_start, self.date_end)
 
+    @property
+    def send_button(self):
+        if self.__send_button is None:
+            self.__send_button = ft.ElevatedButton(_("Send"), on_click=lambda _: self.submit())
+        return self.__send_button
+
+    @property
+    def cancel_button(self):
+        if self.__cancel_button is None:
+            self.__cancel_button = ft.ElevatedButton(_("Cancel"), on_click=lambda _: self.close())
+        return self.__cancel_button
+
     def get_form_view(self, client) -> ft.View:
 
         self.buttons.controls = [
-            ft.ElevatedButton(_("Send"), on_click=lambda _: self.submit()),
-            ft.ElevatedButton(_("Cancel"), on_click=lambda _: self.close()),
+            self.send_button,
+            self.cancel_button,
         ]
         column = ft.Column(
             controls=[
@@ -98,6 +112,7 @@ class BookingFormView(object):
             #     on_replace = self.on_replace(booking)
             #     return self.alert_dialog(on_replace, bookings)
             # else:
+            self.send_button.disabled = True
             self.save(booking)
             self.close()
         else:
