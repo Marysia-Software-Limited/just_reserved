@@ -99,6 +99,7 @@ class BookingFormView(object):
             #     return self.alert_dialog(on_replace, bookings)
             # else:
             self.save(booking)
+            self.close()
         else:
             email_html_error = form.errors.get("email")
 
@@ -180,6 +181,7 @@ class BookingFormView(object):
             """TODO: use transaction here"""
             self.bookings.filter(email=booking.email).delete()
             self.save(booking)
+            self.close()
 
         return __on_replace
 
