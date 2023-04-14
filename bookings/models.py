@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta
 from email.mime.image import MIMEImage
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from email.utils import make_msgid
 from hashlib import md5
 
@@ -73,7 +75,6 @@ class Booking(models.Model):
     def count(self):
         return self.pod.amount - self.conflicts.count()
 
-
     @property
     def date_str(self):
         return date_str(self.date_start)
@@ -102,10 +103,10 @@ class Booking(models.Model):
         img_cid = make_msgid()
 
         context = {
-                'domain': domain,
-                'booking': self,
-                'img_cid': img_cid
-            }
+            'domain': domain,
+            'booking': self,
+            'img_cid': img_cid
+        }
         body_html = render_to_string(
             'email_verification.html',
             context
@@ -115,11 +116,33 @@ class Booking(models.Model):
             context
         )
 
-        email = EmailMessage(to=[self.email], subject=subject, body=body_html, from_email="info@marysia.app")
-        email.content_subtype = "html"
+        email = EmailMessage(subject, None, "info@marysia.app", [self.email])
+        # email.content_subtype = "html"
+
+        # https://stackoverflow.com/questions/1633109/creating-a-mime-email-template-with-images-to-send-with-python-django
+
+        # Create a "related" message container that will hold the HTML
+        # message and the image. These are "related" (not "alternative")
+        # because they are different, unique parts of the HTML message,
+        # not alternative (html vs. plain text) views of the same content.
+        html_part = MIMEMultipart(_subtype='related')
+
+        # Create the body with HTML. Note that the image, since it is inline, is
+        # referenced with the URL cid:myimage... you should take care to make
+        # "myimage" unique
+        body = MIMEText(body_html, _subtype='html')
+        html_part.attach(body)
+
+        # Configure and send an EmailMessage
+        # Note we are passing None for the body (the 2nd parameter). You could pass plain text
+        # to create an alternative part for this message
+        email.attach(html_part)  # Attach the raw MIMEBase descendant. This is a public method on EmailMessage
+
         with open(image_path, 'rb') as image:
+            # Now create the MIME container for the image
             mime_image = MIMEImage(image.read())
             mime_image.add_header('Content-ID', f"<{img_cid}>")
+            mime_image.add_header("Content-Disposition", "inline", filename="welcome_email.png")
             email.attach(mime_image)
-
+            # html_part.attach(mime_image)
         email.send()

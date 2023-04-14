@@ -22,7 +22,7 @@ class BookingView(View):
         booking = get_from_token(token)
         if booking is not None:
             self.action(booking)
-        return render(request, "")
+        return render(request, "delete_booking.html")
 
 
 class BookingActivateView(BookingView):
